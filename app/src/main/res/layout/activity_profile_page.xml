@@ -1,0 +1,688 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    tools:context=".profile_page"
+    android:background="#ddf7f6">
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:orientation="vertical">
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="0dp"
+            android:layout_weight="1"
+            android:orientation="horizontal">
+
+            <Button
+                android:id="@+id/back_button"
+                android:layout_width="20dp"
+                android:layout_height="20dp"
+                android:layout_gravity="center_vertical"
+                android:layout_marginStart="20dp"
+                android:background="@drawable/back_arrow"/>
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_gravity="center_vertical"
+                android:layout_marginStart="20dp"
+                android:text="My Profile"
+                android:textSize="25sp"
+                android:textStyle="bold"
+                android:textColor="#156f77"/>
+
+            <Button
+                android:id="@+id/bt_settings"
+                android:layout_width="20dp"
+                android:layout_height="7dp"
+                android:layout_gravity="center_vertical"
+                android:layout_marginStart="185dp"
+                android:background="@drawable/settings_dots"/>
+
+        </LinearLayout>
+
+        <RelativeLayout
+            android:layout_width="match_parent"
+            android:layout_height="0dp"
+            android:layout_weight="3.2">
+
+            <ImageView
+                android:layout_width="match_parent"
+                android:layout_height="120dp"
+                android:src="@drawable/ali_backdrop"/>
+
+            <de.hdodenhof.circleimageview.CircleImageView
+                android:id="@+id/ali_profilepic"
+                android:layout_width="90dp"
+                android:layout_height="90dp"
+                android:layout_marginTop="70dp"
+                android:layout_marginStart="40dp"
+                android:src="@drawable/ali_circle"/>
+
+            <de.hdodenhof.circleimageview.CircleImageView
+                android:layout_width="30dp"
+                android:layout_height="30dp"
+                android:layout_marginTop="100dp"
+                android:layout_alignParentEnd="true"
+                android:layout_marginEnd="20dp"
+                android:src="@drawable/edit_icon"/>
+
+            <de.hdodenhof.circleimageview.CircleImageView
+                android:id="@+id/edit_profile_button"
+                android:layout_width="30dp"
+                android:layout_height="30dp"
+                android:layout_alignBottom="@id/ali_profilepic"
+                android:layout_alignEnd="@id/ali_profilepic"
+                android:layout_marginBottom="5dp"
+                android:src="@drawable/edit_icon"/>
+
+            <TextView
+                android:id="@+id/username_text"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_gravity="center_vertical"
+                android:layout_marginStart="70dp"
+                android:layout_below="@id/ali_profilepic"
+                android:text="Ali"
+                android:textSize="25sp"
+                android:textStyle="bold"
+                android:textColor="#156f77"/>
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="50dp"
+                android:layout_below="@id/username_text"
+                android:text="Islamabad"
+                android:textSize="15sp"
+                android:textStyle="bold"
+                android:textColor="#918b8b"/>
+
+            <Button
+                android:id="@+id/sessions_button"
+                android:layout_width="130dp"
+                android:layout_height="40dp"
+                android:layout_alignParentBottom="true"
+                android:layout_centerHorizontal="true"
+                android:background="@drawable/gold_rounded_box"
+                android:text="Booked Sessions"
+                android:textSize="11sp"
+                android:textColor="#156f77"/>
+
+        </RelativeLayout>
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="0dp"
+            android:layout_weight="6"
+            android:orientation="vertical">
+
+            <RelativeLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="15dp">
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginStart="20dp"
+                    android:text="Favorite Mentors"
+                    android:textColor="#156f77"
+                    android:textStyle="bold"/>
+
+            </RelativeLayout>
+
+            <HorizontalScrollView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content">
+
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent"
+                    android:orientation="horizontal"
+                    android:scrollHorizontally="true">
+                    <RelativeLayout
+                        android:id="@+id/john_profile_button"
+                        android:clickable="true"
+                        android:layout_width="160dp"
+                        android:layout_height="170dp"
+                        android:layout_marginTop="10dp"
+                        android:layout_marginLeft="5dp"
+                        android:background="@drawable/lightgray_rounded_box">
+
+                        <RelativeLayout
+                            android:layout_width="match_parent"
+                            android:layout_height="55dp"
+                            android:layout_alignParentBottom="true"
+                            android:layout_marginBottom="10dp"
+                            android:layout_marginHorizontal="5dp"
+                            android:background="@drawable/white_rounded_box">
+                            <LinearLayout
+                                android:layout_width="match_parent"
+                                android:layout_height="match_parent"
+                                android:orientation="vertical">
+
+                                <LinearLayout
+                                    android:layout_width="match_parent"
+                                    android:layout_height="wrap_content"
+                                    android:orientation="horizontal">
+
+                                    <TextView
+                                        android:layout_width="wrap_content"
+                                        android:layout_height="wrap_content"
+                                        android:layout_marginTop="5dp"
+                                        android:layout_marginStart="7dp"
+                                        android:text="John Cooper"
+                                        android:textColor="@color/black"
+                                        android:textSize="14sp"
+                                        android:textStyle="bold" />
+                                    <TextView
+                                        android:layout_width="match_parent"
+                                        android:layout_height="wrap_content"
+                                        android:layout_marginEnd="2dp"
+                                        android:layout_marginTop="3dp"
+                                        android:text="$1500/Session"
+                                        android:textStyle="bold"
+                                        android:textAlignment="textEnd"
+                                        android:textSize="6sp"
+                                        android:textColor="#EBB800"/>
+                                </LinearLayout>
+
+                                <TextView
+                                    android:layout_width="match_parent"
+                                    android:layout_height="wrap_content"
+                                    android:layout_marginStart="7dp"
+                                    android:text="UX Designer @ Google"
+                                    android:textColor="@color/black"
+                                    android:textSize="8sp"
+                                    android:textAlignment="gravity" />
+
+                                <LinearLayout
+                                    android:layout_width="match_parent"
+                                    android:layout_height="wrap_content"
+                                    android:orientation="horizontal">
+
+                                    <ImageView
+                                        android:layout_width="7dp"
+                                        android:layout_height="7dp"
+                                        android:src="@drawable/green_circle"
+                                        android:layout_gravity="center"
+                                        android:layout_marginStart="10dp"/>
+                                    <TextView
+                                        android:layout_width="wrap_content"
+                                        android:layout_height="wrap_content"
+                                        android:text="Available"
+                                        android:textSize="10sp"
+                                        android:textColor="#40ac01"
+                                        android:gravity="center_vertical"
+                                        android:layout_marginStart="2dp"/>
+
+                                </LinearLayout>
+
+                            </LinearLayout>
+                            <Button
+                                android:layout_width="15dp"
+                                android:layout_height="15dp"
+                                android:layout_alignParentBottom="true"
+                                android:layout_alignParentEnd="true"
+                                android:layout_margin="10dp"
+                                android:background="@drawable/red_heart"/>
+                        </RelativeLayout>
+                    </RelativeLayout>
+
+                    <RelativeLayout
+                        android:layout_width="160dp"
+                        android:layout_height="170dp"
+                        android:layout_marginTop="10dp"
+                        android:layout_marginLeft="5dp"
+                        android:background="@drawable/lightgray_rounded_box">
+
+                        <RelativeLayout
+                            android:layout_width="match_parent"
+                            android:layout_height="55dp"
+                            android:layout_alignParentBottom="true"
+                            android:layout_marginBottom="10dp"
+                            android:layout_marginHorizontal="5dp"
+                            android:background="@drawable/white_rounded_box">
+                            <LinearLayout
+                                android:layout_width="match_parent"
+                                android:layout_height="match_parent"
+                                android:orientation="vertical">
+
+                                <LinearLayout
+                                    android:layout_width="match_parent"
+                                    android:layout_height="wrap_content"
+                                    android:orientation="horizontal">
+
+                                    <TextView
+                                        android:layout_width="wrap_content"
+                                        android:layout_height="wrap_content"
+                                        android:layout_marginTop="5dp"
+                                        android:layout_marginStart="7dp"
+                                        android:text="Martina Watson"
+                                        android:textColor="@color/black"
+                                        android:textSize="14sp"
+                                        android:textStyle="bold" />
+                                    <TextView
+                                        android:layout_width="match_parent"
+                                        android:layout_height="wrap_content"
+                                        android:layout_marginEnd="2dp"
+                                        android:layout_marginTop="3dp"
+                                        android:text="$500/Session"
+                                        android:textStyle="bold"
+                                        android:textAlignment="textEnd"
+                                        android:textSize="6sp"
+                                        android:textColor="#EBB800"/>
+                                </LinearLayout>
+
+                                <TextView
+                                    android:layout_width="match_parent"
+                                    android:layout_height="wrap_content"
+                                    android:layout_marginStart="7dp"
+                                    android:text="Lead - Technology Officer"
+                                    android:textColor="@color/black"
+                                    android:textSize="8sp"
+                                    android:textAlignment="gravity" />
+
+                                <LinearLayout
+                                    android:layout_width="match_parent"
+                                    android:layout_height="wrap_content"
+                                    android:orientation="horizontal">
+
+                                    <ImageView
+                                        android:layout_width="7dp"
+                                        android:layout_height="7dp"
+                                        android:src="@drawable/grey_circle"
+                                        android:layout_gravity="center"
+                                        android:layout_marginStart="10dp"/>
+                                    <TextView
+                                        android:layout_width="wrap_content"
+                                        android:layout_height="wrap_content"
+                                        android:text="Available"
+                                        android:textSize="10sp"
+                                        android:textColor="#918b8b"
+                                        android:gravity="center_vertical"
+                                        android:layout_marginStart="2dp"/>
+
+                                </LinearLayout>
+
+                            </LinearLayout>
+                            <Button
+                                android:layout_width="15dp"
+                                android:layout_height="15dp"
+                                android:layout_alignParentBottom="true"
+                                android:layout_alignParentEnd="true"
+                                android:layout_margin="10dp"
+                                android:background="@drawable/grey_heart"/>
+                        </RelativeLayout>
+                    </RelativeLayout>
+
+                    <RelativeLayout
+                        android:layout_width="160dp"
+                        android:layout_height="170dp"
+                        android:layout_marginTop="10dp"
+                        android:layout_marginLeft="5dp"
+                        android:background="@drawable/lightgray_rounded_box">
+
+                        <RelativeLayout
+                            android:layout_width="match_parent"
+                            android:layout_height="55dp"
+                            android:layout_alignParentBottom="true"
+                            android:layout_marginBottom="10dp"
+                            android:layout_marginHorizontal="5dp"
+                            android:background="@drawable/white_rounded_box">
+                            <LinearLayout
+                                android:layout_width="match_parent"
+                                android:layout_height="match_parent"
+                                android:orientation="vertical">
+
+                                <LinearLayout
+                                    android:layout_width="match_parent"
+                                    android:layout_height="wrap_content"
+                                    android:orientation="horizontal">
+
+                                    <TextView
+                                        android:layout_width="wrap_content"
+                                        android:layout_height="wrap_content"
+                                        android:layout_marginTop="5dp"
+                                        android:layout_marginStart="7dp"
+                                        android:text="Emma"
+                                        android:textColor="@color/black"
+                                        android:textSize="14sp"
+                                        android:textStyle="bold" />
+                                    <TextView
+                                        android:layout_width="match_parent"
+                                        android:layout_height="wrap_content"
+                                        android:layout_marginEnd="2dp"
+                                        android:layout_marginTop="3dp"
+                                        android:text="$500/Session"
+                                        android:textStyle="bold"
+                                        android:textAlignment="textEnd"
+                                        android:textSize="6sp"
+                                        android:textColor="#EBB800"/>
+                                </LinearLayout>
+
+                                <TextView
+                                    android:layout_width="match_parent"
+                                    android:layout_height="wrap_content"
+                                    android:layout_marginStart="7dp"
+                                    android:text="Lead - Corporate Officer"
+                                    android:textColor="@color/black"
+                                    android:textSize="8sp"
+                                    android:textAlignment="gravity" />
+
+                                <LinearLayout
+                                    android:layout_width="match_parent"
+                                    android:layout_height="wrap_content"
+                                    android:orientation="horizontal">
+
+                                    <ImageView
+                                        android:layout_width="7dp"
+                                        android:layout_height="7dp"
+                                        android:src="@drawable/grey_circle"
+                                        android:layout_gravity="center"
+                                        android:layout_marginStart="10dp"/>
+                                    <TextView
+                                        android:layout_width="wrap_content"
+                                        android:layout_height="wrap_content"
+                                        android:text="Available"
+                                        android:textSize="10sp"
+                                        android:textColor="#918b8b"
+                                        android:gravity="center_vertical"
+                                        android:layout_marginStart="2dp"/>
+
+                                </LinearLayout>
+
+                            </LinearLayout>
+                            <Button
+                                android:layout_width="15dp"
+                                android:layout_height="15dp"
+                                android:layout_alignParentBottom="true"
+                                android:layout_alignParentEnd="true"
+                                android:layout_margin="10dp"
+                                android:background="@drawable/grey_heart"/>
+                        </RelativeLayout>
+                    </RelativeLayout>
+
+                </LinearLayout>
+            </HorizontalScrollView>
+
+
+            <RelativeLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="15dp">
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginStart="20dp"
+                    android:text="My Reviews"
+                    android:textColor="#156f77"
+                    android:textStyle="bold"/>
+
+            </RelativeLayout>
+
+            <HorizontalScrollView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content">
+
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:orientation="horizontal"
+                    android:scrollHorizontally="true">
+
+                    <LinearLayout
+                        android:layout_width="140dp"
+                        android:layout_height="120dp"
+                        android:layout_marginTop="10dp"
+                        android:layout_marginLeft="5dp"
+                        android:orientation="vertical"
+                        android:background="@drawable/blue_rounded_box">
+
+                        <TextView
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:layout_gravity="center_horizontal"
+                            android:layout_marginTop="30dp"
+                            android:text="John Cooper"
+                            android:textColor="@color/white"
+                            android:textSize="12sp"/>
+
+                        <LinearLayout
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:layout_gravity="center_horizontal"
+                            android:layout_marginTop="5dp"
+                            android:orientation="horizontal">
+
+                            <Button
+                                android:layout_marginHorizontal="1dp"
+                                android:layout_width="10dp"
+                                android:layout_height="10dp"
+                                android:background="@drawable/gold_star"/>
+                            <Button
+                                android:layout_marginHorizontal="1dp"
+                                android:layout_width="10dp"
+                                android:layout_height="10dp"
+                                android:background="@drawable/gold_star"/>
+                            <Button
+                                android:layout_marginHorizontal="1dp"
+                                android:layout_width="10dp"
+                                android:layout_height="10dp"
+                                android:background="@drawable/gold_star"/>
+                            <Button
+                                android:layout_marginHorizontal="1dp"
+                                android:layout_width="10dp"
+                                android:layout_height="10dp"
+                                android:background="@drawable/gold_star"/>
+                            <Button
+                                android:layout_marginHorizontal="1dp"
+                                android:layout_width="10dp"
+                                android:layout_height="10dp"
+                                android:background="@drawable/gold_star_unfilled"/>
+                        </LinearLayout>
+
+                        <TextView
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:layout_gravity="center_horizontal"
+                            android:layout_marginTop="5dp"
+                            android:text="John provided excellent\nprototyping techniques\nand insights. I highly\nrecommend him!"
+                            android:textSize="8sp"/>
+
+                    </LinearLayout>
+
+                    <LinearLayout
+                        android:layout_width="140dp"
+                        android:layout_height="120dp"
+                        android:layout_marginTop="10dp"
+                        android:layout_marginLeft="10dp"
+                        android:orientation="vertical"
+                        android:background="@drawable/blue_rounded_box">
+
+                        <TextView
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:layout_gravity="center_horizontal"
+                            android:layout_marginTop="30dp"
+                            android:text="Emma Phillips"
+                            android:textColor="@color/white"
+                            android:textSize="12sp"/>
+
+                        <LinearLayout
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:layout_gravity="center_horizontal"
+                            android:layout_marginTop="5dp"
+                            android:orientation="horizontal">
+
+                            <Button
+                                android:layout_marginHorizontal="1dp"
+                                android:layout_width="10dp"
+                                android:layout_height="10dp"
+                                android:background="@drawable/gold_star"/>
+                            <Button
+                                android:layout_marginHorizontal="1dp"
+                                android:layout_width="10dp"
+                                android:layout_height="10dp"
+                                android:background="@drawable/gold_star"/>
+                            <Button
+                                android:layout_marginHorizontal="1dp"
+                                android:layout_width="10dp"
+                                android:layout_height="10dp"
+                                android:background="@drawable/gold_star"/>
+                            <Button
+                                android:layout_marginHorizontal="1dp"
+                                android:layout_width="10dp"
+                                android:layout_height="10dp"
+                                android:background="@drawable/gold_star_unfilled"/>
+                            <Button
+                                android:layout_marginHorizontal="1dp"
+                                android:layout_width="10dp"
+                                android:layout_height="10dp"
+                                android:background="@drawable/gold_star_unfilled"/>
+                        </LinearLayout>
+
+                        <TextView
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:layout_gravity="center_horizontal"
+                            android:layout_marginTop="5dp"
+                            android:text="Her tips were valuable.\nWould love to connect\nagain."
+                            android:textSize="8sp"/>
+
+                    </LinearLayout>
+
+                    <LinearLayout
+                        android:layout_width="140dp"
+                        android:layout_height="120dp"
+                        android:layout_marginTop="10dp"
+                        android:layout_marginLeft="10dp"
+                        android:orientation="vertical"
+                        android:background="@drawable/blue_rounded_box">
+
+                        <TextView
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:layout_gravity="center_horizontal"
+                            android:layout_marginTop="30dp"
+                            android:text="Jane"
+                            android:textColor="@color/white"
+                            android:textSize="12sp"/>
+
+                        <LinearLayout
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:layout_gravity="center_horizontal"
+                            android:layout_marginTop="5dp"
+                            android:orientation="horizontal">
+
+                            <Button
+                                android:layout_marginHorizontal="1dp"
+                                android:layout_width="10dp"
+                                android:layout_height="10dp"
+                                android:background="@drawable/gold_star"/>
+                            <Button
+                                android:layout_marginHorizontal="1dp"
+                                android:layout_width="10dp"
+                                android:layout_height="10dp"
+                                android:background="@drawable/gold_star"/>
+                            <Button
+                                android:layout_marginHorizontal="1dp"
+                                android:layout_width="10dp"
+                                android:layout_height="10dp"
+                                android:background="@drawable/gold_star"/>
+                            <Button
+                                android:layout_marginHorizontal="1dp"
+                                android:layout_width="10dp"
+                                android:layout_height="10dp"
+                                android:background="@drawable/gold_star_unfilled"/>
+                            <Button
+                                android:layout_marginHorizontal="1dp"
+                                android:layout_width="10dp"
+                                android:layout_height="10dp"
+                                android:background="@drawable/gold_star_unfilled"/>
+                        </LinearLayout>
+
+                        <TextView
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:layout_gravity="center_horizontal"
+                            android:layout_marginTop="5dp"
+                            android:text="Impressive Sessions."
+                            android:textSize="8sp"/>
+
+                    </LinearLayout>
+
+                </LinearLayout>
+
+            </HorizontalScrollView>
+
+        </LinearLayout>
+
+    </LinearLayout>
+
+    <LinearLayout
+        android:id="@+id/taskbar"
+        android:layout_width="match_parent"
+        android:layout_height="60dp"
+        android:layout_alignParentBottom="true"
+        android:orientation="horizontal"
+        android:layout_centerHorizontal="true"
+        android:background="#156f77"
+        android:gravity="center">
+
+        <Button
+            android:id="@+id/bthome"
+            android:layout_width="35dp"
+            android:layout_height="35dp"
+            android:background="@drawable/home_taskbar"
+            android:scaleY="0.7"
+            android:scaleX="0.65"/>
+
+        <Button
+            android:id="@+id/btsearch"
+            android:layout_width="35dp"
+            android:layout_height="35dp"
+            android:layout_marginStart="50dp"
+            android:layout_marginEnd="50dp"
+            android:background="@drawable/search_taskbar"
+            android:scaleY="0.7"
+            android:scaleX="0.65"/>
+
+        <Button
+            android:id="@+id/btchat"
+            android:layout_width="35dp"
+            android:layout_height="35dp"
+            android:layout_marginEnd="50dp"
+            android:layout_marginStart="50dp"
+            android:background="@drawable/chat_taskbar"
+            android:scaleY="0.7"
+            android:scaleX="0.65"/>
+
+        <Button
+            android:id="@+id/btprofile"
+            android:layout_width="35dp"
+            android:layout_height="35dp"
+            android:background="@drawable/profile_taskbar"
+            android:scaleY="0.7"
+            android:scaleX="0.65"/>
+
+    </LinearLayout>
+    <Button
+        android:id="@+id/btaddcontent"
+        android:layout_width="60dp"
+        android:layout_height="60dp"
+        android:background="@drawable/plus_sign2"
+        android:layout_centerHorizontal="true"
+        android:layout_alignParentBottom="true"
+        android:layout_marginBottom="30dp"/>
+
+</RelativeLayout>

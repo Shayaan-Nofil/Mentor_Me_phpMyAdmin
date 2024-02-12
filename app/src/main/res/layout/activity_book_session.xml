@@ -1,0 +1,209 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    tools:context=".drop_review"
+    android:background="#ddf7f6"
+    android:orientation="vertical">
+
+    <RelativeLayout
+        android:layout_width="match_parent"
+        android:layout_height="0dp"
+        android:layout_weight="1"
+        android:background="@drawable/rounded_square_review">
+
+        <Button
+            android:background="@drawable/back_arrow"
+            android:id="@+id/back_button"
+            android:layout_width="20dp"
+            android:layout_height="20dp"
+            android:layout_alignParentStart="true"
+            android:layout_alignParentTop="true"
+            android:layout_marginStart="30dp"
+            android:layout_marginTop="70dp"/>
+        
+        <TextView
+            android:id="@+id/booksess_text"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_alignBottom="@id/back_button"
+            android:layout_toRightOf="@id/back_button"
+            android:layout_marginStart="10dp"
+            android:text="Book your Session"
+            android:textSize="16sp"
+            android:textStyle="bold"
+            android:textColor="#156f77"/>
+
+        <TextView
+            android:id="@+id/name_text"
+            android:text="John Cooper"
+            android:textSize="30sp"
+            android:textStyle="bold"
+            android:textColor="@color/white"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_alignStart="@id/booksess_text"
+            android:layout_below="@id/back_button"
+            android:layout_marginTop="25dp"
+            />
+
+        <ImageView
+            android:src="@drawable/gold_star"
+            android:id="@+id/rating_star"
+            android:layout_width="17dp"
+            android:layout_height="17dp"
+            android:layout_alignStart="@id/booksess_text"
+            android:layout_below="@id/name_text"
+            android:layout_marginTop="15dp" />
+
+        <TextView
+            android:id="@+id/rating_text"
+            android:text="4.9"
+            android:textSize="20sp"
+            android:textStyle="bold"
+            android:textColor="@color/white"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_toRightOf="@id/rating_star"
+            android:layout_below="@id/name_text"
+            android:layout_marginTop="10dp"
+            android:layout_marginStart="2dp" />
+
+        <ImageView
+            android:id="@+id/johnimg"
+            android:layout_width="100dp"
+            android:layout_height="100dp"
+            android:src="@drawable/john_circle2"
+            android:layout_below="@id/booksess_text"
+            android:layout_alignParentEnd="true"
+            android:layout_marginEnd="20dp"/>
+
+        <ImageView
+            android:id="@+id/seperator"
+            android:layout_width="match_parent"
+            android:layout_height="2dp"
+            android:src="#ddf7f6"
+            android:layout_below="@id/johnimg"
+            android:layout_marginTop="15dp"/>
+
+        <TextView
+            android:id="@+id/review_text"
+            android:text="$1500/Session"
+            android:textSize="20sp"
+            android:textColor="#ffc809"
+            android:textStyle="bold"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_alignStart="@id/name_text"
+            android:layout_below="@id/seperator"
+            android:layout_marginTop="30dp"
+            />
+
+        <Button
+            android:id="@+id/message_button"
+            android:layout_width="35dp"
+            android:layout_height="35dp"
+            android:background="@drawable/message_gold_icon"
+            android:layout_below="@id/seperator"
+            android:layout_marginTop="25dp"
+            android:layout_alignParentEnd="true"
+            android:layout_marginEnd="110dp"/>
+
+        <Button
+            android:id="@+id/call_button"
+            android:layout_width="35dp"
+            android:layout_height="35dp"
+            android:background="@drawable/call_gold_icon"
+            android:layout_below="@id/seperator"
+            android:layout_marginTop="25dp"
+            android:layout_alignParentEnd="true"
+            android:layout_marginEnd="60dp"/>
+
+        <Button
+            android:id="@+id/video_button"
+            android:layout_width="35dp"
+            android:layout_height="35dp"
+            android:background="@drawable/video_gold_icon"
+            android:layout_below="@id/seperator"
+            android:layout_marginTop="25dp"
+            android:layout_alignParentEnd="true"
+            android:layout_marginEnd="10dp"/>
+
+
+    </RelativeLayout>
+
+    <RelativeLayout
+        android:layout_width="match_parent"
+        android:layout_height="0dp"
+        android:layout_weight="2">
+
+        <CalendarView
+            android:id="@+id/calender"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_centerHorizontal="true"
+            android:layout_marginTop="20dp"/>
+
+        <TextView
+            android:id="@+id/avail_text"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_below="@id/calender"
+            android:layout_marginStart="30dp"
+            android:text="Available Time Slots"
+            android:textSize="20dp"
+            android:textStyle="bold"/>
+
+        <LinearLayout
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_centerHorizontal="true"
+            android:layout_below="@id/avail_text"
+            android:layout_marginTop="20dp"
+            android:orientation="horizontal">
+
+            <Button
+                android:layout_width="100dp"
+                android:layout_height="50dp"
+                android:background="@drawable/lightgray_rounded_box"
+                android:text="10:00 AM"
+                android:layout_marginHorizontal="10dp"/>
+
+            <Button
+                android:layout_width="100dp"
+                android:layout_height="50dp"
+                android:background="@drawable/deepblue_rounded_box"
+                android:text="11:00 AM"
+                android:textColor="@color/white"
+                android:layout_marginHorizontal="10dp"/>
+
+            <Button
+                android:layout_width="100dp"
+                android:layout_height="50dp"
+                android:background="@drawable/lightgray_rounded_box"
+                android:text="12:00 PM"
+                android:layout_marginHorizontal="10dp"/>
+
+        </LinearLayout>
+
+
+
+        <Button
+            android:id="@+id/book_button"
+            android:text="Book an Appointment"
+            android:textAllCaps="false"
+            android:textSize="15sp"
+            android:textColor="@color/white"
+            android:background="@drawable/green_rounded_rectangle"
+            android:layout_width="match_parent"
+            android:layout_height="50dp"
+            android:layout_alignParentBottom="true"
+            android:layout_centerHorizontal="true"
+            android:layout_marginBottom="40dp"
+            android:layout_marginStart="20dp"
+            android:layout_marginEnd="20dp"/>
+
+    </RelativeLayout>
+</LinearLayout>

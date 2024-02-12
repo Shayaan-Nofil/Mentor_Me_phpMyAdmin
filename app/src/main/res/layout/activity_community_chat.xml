@@ -1,0 +1,184 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    tools:context=".individual_chat"
+    android:background="#ddf7f6">
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:orientation="vertical">
+
+        <RelativeLayout
+            android:layout_weight="3"
+            android:layout_width="match_parent"
+            android:layout_height="0dp"
+            android:background="@drawable/john_community">
+
+            <Button
+                android:id="@+id/back_button"
+                android:layout_width="30dp"
+                android:layout_height="30dp"
+                android:layout_marginStart="20dp"
+                android:layout_marginTop="40dp"
+                android:background="#00FFFFFF"/>
+
+            <Button
+                android:id="@+id/videocall_button"
+                android:layout_width="30dp"
+                android:layout_height="40dp"
+                android:layout_marginEnd="40dp"
+                android:layout_marginTop="40dp"
+                android:layout_alignParentEnd="true"
+                android:background="#00FFFFFF"/>
+            <Button
+                android:id="@+id/voicecall_button"
+                android:layout_width="30dp"
+                android:layout_height="40dp"
+                android:layout_marginEnd="80dp"
+                android:layout_marginTop="40dp"
+                android:layout_alignParentEnd="true"
+                android:background="#00FFFFFF"/>
+        </RelativeLayout>
+
+        <RelativeLayout
+            android:layout_width="match_parent"
+            android:layout_height="0dp"
+            android:layout_weight="5">
+
+            <ImageView
+                android:layout_width="match_parent"
+                android:layout_height="400dp"
+                android:layout_alignParentBottom="true"
+                android:src="@drawable/community_text"
+                android:layout_marginBottom="10dp"/>
+
+        </RelativeLayout>
+
+        <RelativeLayout
+            android:layout_width="match_parent"
+            android:layout_height="0dp"
+            android:layout_weight="2">
+
+            <ImageView
+                android:id="@+id/chat_UI"
+                android:layout_width="match_parent"
+                android:layout_height="100dp"
+                android:background="@drawable/chat_controls"
+                android:layout_marginHorizontal="10dp"
+                android:layout_marginBottom="80dp"/>
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="40dp"
+                android:layout_marginTop="10dp"
+                android:layout_alignStart="@id/chat_UI"
+                android:layout_alignEnd="@id/chat_UI"
+                android:orientation="horizontal">
+
+                <Button
+                    android:id="@+id/btattach"
+                    android:background="#00FFFFFF"
+                    android:layout_width="30dp"
+                    android:layout_height="40dp" />
+
+                <Button
+                    android:id="@+id/btattcontent"
+                    android:background="#00FFFFFF"
+                    android:layout_width="30dp"
+                    android:layout_height="40dp" />
+
+                <EditText
+                    android:layout_width="245dp"
+                    android:layout_height="40dp"
+                    android:scrollHorizontally="true"
+                    android:singleLine="true"
+                    android:text="Type something..."
+                    android:textSize="15sp"
+                    android:textColor="#F4F3F3"/>
+
+                <Button
+                    android:id="@+id/btcamera"
+                    android:background="#00FFFFFF"
+                    android:layout_width="30dp"
+                    android:layout_height="40dp" />
+
+                <Button
+                    android:id="@+id/btvcrec"
+                    android:background="#00FFFFFF"
+                    android:layout_width="25dp"
+                    android:layout_height="40dp" />
+
+                <Button
+                    android:id="@+id/btsend"
+                    android:background="#00FFFFFF"
+                    android:layout_width="30dp"
+                    android:layout_height="40dp"/>
+            </LinearLayout>
+
+        </RelativeLayout>
+
+
+    </LinearLayout>
+
+    <LinearLayout
+        android:id="@+id/taskbar"
+        android:layout_width="match_parent"
+        android:layout_height="60dp"
+        android:layout_alignParentBottom="true"
+        android:orientation="horizontal"
+        android:layout_centerHorizontal="true"
+        android:background="#156f77"
+        android:gravity="center">
+
+        <Button
+            android:id="@+id/bthome"
+            android:layout_width="35dp"
+            android:layout_height="35dp"
+            android:background="@drawable/home_taskbar"
+            android:scaleY="0.7"
+            android:scaleX="0.65"/>
+
+        <Button
+            android:id="@+id/btsearch"
+            android:layout_width="35dp"
+            android:layout_height="35dp"
+            android:layout_marginStart="50dp"
+            android:layout_marginEnd="50dp"
+            android:background="@drawable/search_taskbar"
+            android:scaleY="0.7"
+            android:scaleX="0.65"/>
+
+        <Button
+            android:id="@+id/btchat"
+            android:layout_width="35dp"
+            android:layout_height="35dp"
+            android:layout_marginEnd="50dp"
+            android:layout_marginStart="50dp"
+            android:background="@drawable/chat_taskbar"
+            android:scaleY="0.7"
+            android:scaleX="0.65"/>
+
+        <Button
+            android:id="@+id/btprofile"
+            android:layout_width="35dp"
+            android:layout_height="35dp"
+            android:background="@drawable/profile_taskbar"
+            android:scaleY="0.7"
+            android:scaleX="0.65"/>
+
+    </LinearLayout>
+    <Button
+        android:id="@+id/btaddcontent"
+        android:layout_width="60dp"
+        android:layout_height="60dp"
+        android:background="@drawable/plus_sign2"
+        android:layout_centerHorizontal="true"
+        android:layout_alignParentBottom="true"
+        android:layout_marginBottom="30dp"/>
+
+
+</RelativeLayout>
