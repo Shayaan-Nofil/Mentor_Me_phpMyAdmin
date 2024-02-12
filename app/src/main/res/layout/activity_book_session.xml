@@ -185,7 +185,6 @@
                 android:background="@drawable/lightgray_rounded_box"
                 android:text="12:00 PM"
                 android:layout_marginHorizontal="10dp"/>
-
         </LinearLayout>
 
 
