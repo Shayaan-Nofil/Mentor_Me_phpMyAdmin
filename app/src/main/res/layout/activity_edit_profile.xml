@@ -19,7 +19,6 @@
                 android:layout_height="match_parent"
                 android:layout_weight="2.5"
                 android:background="#50c1c9">
-
                 <Button
                     android:background="@drawable/back_arrow"
                     android:id="@+id/back_button"
