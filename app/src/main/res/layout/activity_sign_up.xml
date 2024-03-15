@@ -58,9 +58,9 @@
 
             <EditText
                 android:id="@+id/name_box"
-                android:text="Enter Name"
+                android:hint="Enter Name"
                 android:textSize="15sp"
-                android:textColor="#A0A0A0"
+                android:textColor="@color/black"
                 android:singleLine="true"
                 android:scrollHorizontally="true"
                 android:paddingLeft="15dp"
@@ -85,9 +85,9 @@
 
             <EditText
                 android:id="@+id/email_box"
-                android:text="Enter Email"
+                android:hint="Enter Email"
                 android:textSize="15sp"
-                android:textColor="#A0A0A0"
+                android:textColor="@color/black"
                 android:singleLine="true"
                 android:scrollHorizontally="true"
                 android:paddingLeft="15dp"
@@ -112,9 +112,9 @@
 
             <EditText
                 android:id="@+id/contact_box"
-                android:text="Enter Number"
+                android:hint="Enter Number"
                 android:textSize="15sp"
-                android:textColor="#A0A0A0"
+                android:textColor="@color/black"
                 android:singleLine="true"
                 android:scrollHorizontally="true"
                 android:paddingLeft="15dp"
@@ -193,9 +193,9 @@
 
             <EditText
                 android:id="@+id/password_box"
-                android:text="Enter your password"
+                android:hint="Enter your password"
                 android:textSize="15sp"
-                android:textColor="#A0A0A0"
+                android:textColor="@color/black"
                 android:singleLine="true"
                 android:scrollHorizontally="true"
                 android:paddingLeft="15dp"

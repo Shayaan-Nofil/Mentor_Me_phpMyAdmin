@@ -91,43 +91,14 @@
                     android:textColor="@color/black"
                     android:textSize="12sp"/>
 
-                <LinearLayout
-                    android:id="@+id/john_message_chat"
+                <androidx.recyclerview.widget.RecyclerView
+                    android:id="@+id/recycler_view"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:orientation="horizontal"
-                    android:layout_marginTop="20dp"
-                    android:layout_marginStart="10dp"
                     android:clickable="true">
-                    <de.hdodenhof.circleimageview.CircleImageView
-                        android:layout_width="70dp"
-                        android:layout_height="70dp"
-                        android:src="@drawable/john_circle"/>
 
-                    <LinearLayout
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:orientation="vertical">
-                        <TextView
-                            android:layout_width="wrap_content"
-                            android:layout_height="wrap_content"
-                            android:layout_marginTop="15dp"
-                            android:layout_marginStart="20dp"
-                            android:text="John Cooper"
-                            android:textSize="20sp"
-                            android:textColor="#156f77"
-                            android:textStyle="bold"/>
-                        <TextView
-                            android:layout_width="wrap_content"
-                            android:layout_height="wrap_content"
-                            android:layout_marginStart="20dp"
-                            android:layout_marginTop="2sp"
-                            android:text="1 new message"
-                            android:textSize="10sp"
-                            android:textColor="#a60606"/>
-                    </LinearLayout>
 
-                </LinearLayout>
+                </androidx.recyclerview.widget.RecyclerView>
                 <ImageView
                     android:layout_marginTop="10dp"
                     android:layout_width="match_parent"

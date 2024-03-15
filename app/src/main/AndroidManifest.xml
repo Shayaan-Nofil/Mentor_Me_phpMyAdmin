@@ -23,12 +23,9 @@
         <activity
             android:name=".notifications"
             android:exported="false" />
-        <activity
-            android:name=".main_splash_screen"
-            android:exported="false" />
-        <activity
-            android:name=".Log_in"
-            android:exported="false" />
+<!--        <activity-->
+<!--            android:name=".Log_in"-->
+<!--            android:exported="false" />-->
         <activity
             android:name=".forgot_password_email"
             android:exported="false" />
@@ -91,7 +88,10 @@
             android:exported="false" />
         <activity
             android:name=".Log_in_page"
-            android:exported="true">
+            android:exported="false"/>
+        <activity
+            android:name=".main_splash_screen"
+            android:exported="true" >
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
 
