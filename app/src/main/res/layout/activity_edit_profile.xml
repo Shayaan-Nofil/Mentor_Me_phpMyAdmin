@@ -62,9 +62,9 @@
 
                 <EditText
                     android:id="@+id/name_box"
-                    android:text="Enter Name"
+                    android:hint="Enter Name"
                     android:textSize="15sp"
-                    android:textColor="#A0A0A0"
+                    android:textColor="@color/black"
                     android:singleLine="true"
                     android:scrollHorizontally="true"
                     android:paddingLeft="15dp"
@@ -90,9 +90,9 @@
 
                 <EditText
                     android:id="@+id/email_box"
-                    android:text="Enter Email"
+                    android:hint="Enter Email"
                     android:textSize="15sp"
-                    android:textColor="#A0A0A0"
+                    android:textColor="@color/black"
                     android:singleLine="true"
                     android:scrollHorizontally="true"
                     android:paddingLeft="15dp"
@@ -118,9 +118,9 @@
 
                 <EditText
                     android:id="@+id/contact_box"
-                    android:text="Enter Email"
+                    android:hint="Enter Number"
                     android:textSize="15sp"
-                    android:textColor="#A0A0A0"
+                    android:textColor="@color/black"
                     android:singleLine="true"
                     android:scrollHorizontally="true"
                     android:paddingLeft="15dp"
@@ -146,9 +146,9 @@
 
                 <Spinner
                     android:id="@+id/country_box"
-                    android:text="Select Country"
+                    android:entries="@array/countries"
                     android:textSize="15sp"
-                    android:textColor="#A0A0A0"
+                    android:textColor="@color/black"
                     android:singleLine="true"
                     android:scrollHorizontally="true"
                     android:paddingLeft="15dp"
@@ -172,11 +172,11 @@
                     android:layout_height="wrap_content"
                     android:layout_below="@id/country_box" />
 
-                <Spinner
+                <EditText
                     android:id="@+id/city_box"
-                    android:text="Select City"
+                    android:hint="Select City"
                     android:textSize="15sp"
-                    android:textColor="#A0A0A0"
+                    android:textColor="@color/black"
                     android:singleLine="true"
                     android:scrollHorizontally="true"
                     android:paddingLeft="15dp"
@@ -207,7 +207,9 @@
 
         </LinearLayout>
 
-        <ImageView
+        <de.hdodenhof.circleimageview.CircleImageView
+            android:id="@+id/profile_pic"
+            android:clickable="true"
             android:layout_width="130dp"
             android:layout_height="130dp"
             android:layout_marginTop="190dp"

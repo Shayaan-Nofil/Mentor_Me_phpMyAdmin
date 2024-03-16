@@ -71,7 +71,7 @@
             android:layout_marginTop="10dp"
             android:layout_marginStart="2dp" />
 
-        <ImageView
+        <de.hdodenhof.circleimageview.CircleImageView
             android:id="@+id/johnimg"
             android:layout_width="100dp"
             android:layout_height="100dp"
@@ -165,6 +165,7 @@
             android:orientation="horizontal">
 
             <Button
+                android:id="@+id/bt_10am"
                 android:layout_width="100dp"
                 android:layout_height="50dp"
                 android:background="@drawable/lightgray_rounded_box"
@@ -172,6 +173,7 @@
                 android:layout_marginHorizontal="10dp"/>
 
             <Button
+                android:id="@+id/bt_11am"
                 android:layout_width="100dp"
                 android:layout_height="50dp"
                 android:background="@drawable/deepblue_rounded_box"
@@ -180,6 +182,7 @@
                 android:layout_marginHorizontal="10dp"/>
 
             <Button
+                android:id="@+id/bt_12pm"
                 android:layout_width="100dp"
                 android:layout_height="50dp"
                 android:background="@drawable/lightgray_rounded_box"

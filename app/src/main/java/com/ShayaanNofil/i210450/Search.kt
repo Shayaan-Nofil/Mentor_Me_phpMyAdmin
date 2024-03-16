@@ -3,7 +3,9 @@ package com.ShayaanNofil.i210450
 import android.content.Intent
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
+import android.util.Log
 import android.view.View
+import android.widget.EditText
 
 class Search : AppCompatActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -17,8 +19,12 @@ class Search : AppCompatActivity() {
 
         val searchbutton=findViewById<View>(R.id.search_button)
         searchbutton.setOnClickListener(View.OnClickListener {
-            val temp = Intent(this, search_results::class.java )
-            startActivity(temp)
+            val searchtext : EditText = findViewById(R.id.searchbox)
+            val texts = searchtext.text.toString()
+            val intent = Intent(this, search_results::class.java).apply {
+                putExtra("mentor", texts)
+            }
+            startActivity(intent)
         })
 
         val task_homebutton=findViewById<View>(R.id.bthome)

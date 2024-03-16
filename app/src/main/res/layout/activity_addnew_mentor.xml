@@ -72,8 +72,9 @@
                     android:layout_height="80dp"
                     android:background="@drawable/upload_vid"
                     android:layout_marginEnd="20dp"/>
-                <Button
+                <ImageView
                     android:id="@+id/up_pht"
+                    android:clickable="true"
                     android:layout_width="130dp"
                     android:layout_height="80dp"
                     android:background="@drawable/upload_photo"
@@ -94,9 +95,9 @@
 
             <EditText
                 android:id="@+id/name_box"
-                android:text="Enter Name"
+                android:hint="Enter Name"
                 android:textSize="15sp"
-                android:textColor="#A0A0A0"
+                android:textColor="@color/black"
                 android:singleLine="true"
                 android:scrollHorizontally="true"
                 android:paddingLeft="15dp"
@@ -121,9 +122,9 @@
 
             <EditText
                 android:id="@+id/desc_box"
-                android:text="Enter Description"
+                android:hint="Enter Description"
                 android:textSize="15sp"
-                android:textColor="#A0A0A0"
+                android:textColor="@color/black"
                 android:singleLine="true"
                 android:scrollHorizontally="true"
                 android:paddingLeft="15dp"
@@ -148,6 +149,7 @@
 
             <Spinner
                 android:id="@+id/status_box"
+                android:entries="@array/Status"
                 android:paddingLeft="15dp"
                 android:layout_width="match_parent"
                 android:layout_height="40dp"

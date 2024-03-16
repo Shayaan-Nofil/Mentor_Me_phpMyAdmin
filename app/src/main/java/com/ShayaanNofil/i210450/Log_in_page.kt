@@ -1,5 +1,6 @@
 package com.ShayaanNofil.i210450
 
+import Mentors
 import android.content.Intent
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
@@ -10,20 +11,22 @@ import android.widget.Toast
 import com.google.firebase.Firebase
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.auth.auth
+import com.google.firebase.database.DatabaseReference
+import com.google.firebase.database.FirebaseDatabase
 
 private lateinit var mAuth: FirebaseAuth
-
+private lateinit var database: DatabaseReference
 class Log_in_page : AppCompatActivity() {
+
+    lateinit var email: EditText
+    lateinit var password: EditText
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_log_in)
 
-        mAuth = Firebase.auth
-        val loginbutton=findViewById<View>(R.id.login_button)
 
+        val loginbutton=findViewById<View>(R.id.login_button)
         loginbutton.setOnClickListener(View.OnClickListener {
-            var email:EditText
-            var password:EditText
             email = findViewById<EditText>(R.id.email_box)
             password = findViewById<EditText>(R.id.password_box)
 
@@ -34,7 +37,7 @@ class Log_in_page : AppCompatActivity() {
                 password.setText(" ")
             }
 
-            signin(email.getText().toString(), password.getText().toString())
+            signin(email.text.toString(), password.text.toString())
         })
 
         val signupbutton=findViewById<View>(R.id.signup)
@@ -50,15 +53,41 @@ class Log_in_page : AppCompatActivity() {
         })
     }
     fun signin(email:String,pass:String){
+        var mAuth: FirebaseAuth = Firebase.auth
         mAuth.signInWithEmailAndPassword(email, pass)
             .addOnCompleteListener(this) { task ->
                 if (task.isSuccessful) {
                     // Sign in success, update UI with the signed-in user's information
-                    Log.d("TAG", "signInWithEmail:success")
-                    val user = mAuth.currentUser
+//                    Log.d("TAG", "signInWithEmail:success")
+//                    var mentor: Mentors = Mentors()
+//                    mentor.name = "John Cooper"
+//                    mentor.email = email
+//                    mentor.password = pass
+//                    mentor.job = "UX Designer at\nGoogle"
+//                    mentor.description = "I am a passionate UX designer at Google with a focus on\n" +
+//                            "creating user-centric and intuitive interfaces. With 10 years of\n" +
+//                            "experience, I have had the opportunity to work on diverse\n" +
+//                            "projects that have shaped my understanding of design\n" +
+//                            "principles and user experience"
+//                    mentor.rating = 4.8
+//                    mentor.id = mAuth.uid!!
+//                    mentor.profilepic = "https://firebasestorage.googleapis.com/v0/b/smd-assignment-5b0a4.appspot.com/o/john1.png?alt=media&token=73e33f4e-89be-4071-b6ad-88e5cb3d8a7b"
+//                    mentor.rate = 1500
+//
+//                    val userid = mAuth.uid
+//                    database = FirebaseDatabase.getInstance().getReference("Mentor")
+//
+//                    database.child(userid!!).setValue(mentor).addOnCompleteListener {
+//                        var secondActivityIntent = Intent(this, profile_page::class.java)
+//                        startActivity(secondActivityIntent)
+//                        finish()
+//                    }.addOnFailureListener{
+//                        Log.w("TAG", "Didnt Register", task.exception)
+//                    }
+
                     var secondActivityIntent = Intent(this, home_page::class.java)
                     startActivity(secondActivityIntent)
-                    //finish()
+                    finish()
                 }
                 else {
                     // If sign in fails, display a message to the user.

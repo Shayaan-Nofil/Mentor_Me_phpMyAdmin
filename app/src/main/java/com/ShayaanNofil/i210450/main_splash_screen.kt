@@ -16,7 +16,7 @@ class main_splash_screen : AppCompatActivity() {
 
         CoroutineScope(Dispatchers.Main).launch {
             // Delay for 5 seconds
-            delay(5000)
+            delay(1000)
 
             // Open the new activity here
             val intent = Intent(this@main_splash_screen, Log_in_page::class.java)

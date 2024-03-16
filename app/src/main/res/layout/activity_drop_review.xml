@@ -37,7 +37,8 @@
             android:layout_marginTop="10dp"
             />
 
-        <ImageView
+        <de.hdodenhof.circleimageview.CircleImageView
+            android:id="@+id/mentor_img"
             android:layout_width="100dp"
             android:layout_height="100dp"
             android:src="@drawable/john_circle2"
@@ -88,7 +89,7 @@
             android:background="@drawable/review_textbox"
             android:layout_centerHorizontal="true"
             android:layout_marginTop="80dp"
-            android:text="Type your experience..."
+            android:hint="Type your experience..."
             android:textColor="#949494"
             android:textSize="15sp"
             android:paddingBottom="60dp"
@@ -102,27 +103,32 @@
             android:layout_marginTop="50dp"
             android:orientation="horizontal">
 
-            <Button
+            <ImageButton
+                android:id="@+id/onestar"
                 android:layout_marginHorizontal="7dp"
                 android:layout_width="30dp"
                 android:layout_height="30dp"
                 android:background="@drawable/ratingstar_unfilled"/>
             <Button
+                android:id="@+id/twostar"
                 android:layout_marginHorizontal="7dp"
                 android:layout_width="30dp"
                 android:layout_height="30dp"
                 android:background="@drawable/ratingstar_unfilled"/>
             <Button
+                android:id="@+id/threestar"
                 android:layout_marginHorizontal="7dp"
                 android:layout_width="30dp"
                 android:layout_height="30dp"
                 android:background="@drawable/ratingstar_unfilled"/>
             <Button
+                android:id="@+id/fourstar"
                 android:layout_marginHorizontal="7dp"
                 android:layout_width="30dp"
                 android:layout_height="30dp"
                 android:background="@drawable/ratingstar_unfilled"/>
             <Button
+                android:id="@+id/fivestar"
                 android:layout_marginHorizontal="7dp"
                 android:layout_width="30dp"
                 android:layout_height="30dp"
