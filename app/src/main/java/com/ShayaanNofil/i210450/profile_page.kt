@@ -1,5 +1,7 @@
 package com.ShayaanNofil.i210450
 
+import Mentors
+import Reviews
 import User
 import android.content.Intent
 import android.net.Uri
@@ -11,6 +13,8 @@ import android.widget.Button
 import android.widget.ImageView
 import android.widget.TextView
 import androidx.activity.result.contract.ActivityResultContracts
+import androidx.recyclerview.widget.LinearLayoutManager
+import androidx.recyclerview.widget.RecyclerView
 import com.bumptech.glide.Glide
 import com.google.firebase.Firebase
 import com.google.firebase.auth.FirebaseAuth
@@ -64,7 +68,67 @@ class profile_page : AppCompatActivity() {
             override fun onCancelled(error: DatabaseError){}
         })
 
-        Log.w("TAG", usr.id)
+        val recycle_topmentor: RecyclerView = findViewById(R.id.recycle_favorite_mentors)
+        recycle_topmentor.layoutManager = LinearLayoutManager(this,LinearLayoutManager.HORIZONTAL, false)
+        val mentorarray: MutableList<Mentors> = mutableListOf()
+
+        FirebaseDatabase.getInstance().getReference("Mentor").addValueEventListener(object: ValueEventListener{
+            override fun onDataChange(snapshot: DataSnapshot) {
+                mentorarray.clear()
+                if (snapshot.exists()){
+                    for (data in snapshot.children){
+                        val myclass = data.getValue(Mentors::class.java)
+                        mentorarray.add(myclass!!)
+                    }
+
+                    val adapter = homerecycle_adapter(mentorarray)
+                    recycle_topmentor.adapter = adapter
+
+                    adapter.setOnClickListener(object :
+                        homerecycle_adapter.OnClickListener {
+                        override fun onClick(position: Int, model: Mentors) {
+                            val intent = Intent(this@profile_page, john_profile::class.java)
+                            intent.putExtra("object", model)
+                            startActivity(intent)
+                        }
+                    })
+
+                }
+            }
+            override fun onCancelled(error: DatabaseError) {
+                TODO("Not yet implemented")
+            }
+        })
+
+
+
+
+        val recycle_reviews: RecyclerView = findViewById(R.id.recycle_reviews)
+        recycle_reviews.layoutManager = LinearLayoutManager(this, LinearLayoutManager.HORIZONTAL, false)
+        val reviewarray: MutableList<Reviews> = mutableListOf()
+
+        FirebaseDatabase.getInstance().getReference("Review").addValueEventListener(object: ValueEventListener{
+            override fun onDataChange(snapshot: DataSnapshot) {
+                reviewarray.clear()
+                if (snapshot.exists()){
+                    for (data in snapshot.children){
+                        val myclass = data.getValue(Reviews::class.java)
+                        if (myclass != null) {
+                            if (myclass.userid == userId)
+                                reviewarray.add(myclass)
+                        }
+                    }
+
+                    val adapter = review_recycle_adapter(reviewarray)
+                    recycle_reviews.adapter = adapter
+
+                }
+            }
+            override fun onCancelled(error: DatabaseError) {
+                TODO("Not yet implemented")
+            }
+        })
+
 
         val editbutton=findViewById<View>(R.id.edit_pfpic_bt)
         editbutton.setOnClickListener {
@@ -91,12 +155,6 @@ class profile_page : AppCompatActivity() {
         val sessionbutton=findViewById<View>(R.id.sessions_button)
         sessionbutton.setOnClickListener(View.OnClickListener {
             val temp = Intent(this, booked_sessions::class.java )
-            startActivity(temp)
-        })
-
-        val goprofilebutton=findViewById<View>(R.id.john_profile_button)
-        goprofilebutton.setOnClickListener(View.OnClickListener {
-            val temp = Intent(this, john_profile::class.java )
             startActivity(temp)
         })
 

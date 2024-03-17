@@ -42,6 +42,7 @@ android {
 dependencies {
 
     implementation ("com.github.bumptech.glide:glide:4.8.0")
+    implementation("com.google.firebase:firebase-inappmessaging-display:20.4.0")
     annotationProcessor ("com.github.bumptech.glide:compiler:4.8.0")
     implementation ("com.firebaseui:firebase-ui-storage:7.2.0")
     implementation("com.google.firebase:firebase-analytics")

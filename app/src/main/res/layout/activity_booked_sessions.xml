@@ -33,49 +33,18 @@
         <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:orientation="vertical"
             android:layout_below="@id/booked_text"
             android:layout_marginTop="20dp">
 
-            <LinearLayout
+            <androidx.recyclerview.widget.RecyclerView
+                android:id="@+id/session_recycle"
                 android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:orientation="horizontal">
+                android:layout_height="wrap_content">
 
-                <ImageView
-                    android:layout_marginLeft="35dp"
-                    android:layout_width="120dp"
-                    android:layout_height="120dp"
-                    android:src="@drawable/john1"/>
-
-                <ImageView
-                    android:layout_width="wrap_content"
-                    android:layout_height="110dp"
-                    android:src="@drawable/john_sess"
-                    android:layout_margin="10dp"/>
-
-            </LinearLayout>
-
-            <LinearLayout
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:orientation="horizontal">
-
-                <ImageView
-                    android:layout_marginLeft="35dp"
-                    android:layout_width="120dp"
-                    android:layout_height="120dp"
-                    android:src="@drawable/emma1"/>
-
-                <ImageView
-                    android:layout_width="wrap_content"
-                    android:layout_height="110dp"
-                    android:src="@drawable/emma_sess"
-                    android:layout_margin="10dp"/>
-
-            </LinearLayout>
+            </androidx.recyclerview.widget.RecyclerView>
 
         </LinearLayout>
+
 
 
 

@@ -100,6 +100,9 @@ class book_session : AppCompatActivity() {
         val bookbutton=findViewById<View>(R.id.book_button)
         bookbutton.setOnClickListener(View.OnClickListener {
             session.mentorid = mentor.id
+            session.mentorimg = mentor.profilepic
+            session.mentorname = mentor.name
+            session.mentorjob = mentor.job
             mAuth = Firebase.auth
             session.userid = mAuth.uid!!
 

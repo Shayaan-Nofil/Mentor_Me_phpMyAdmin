@@ -1,0 +1,68 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+android:layout_width="140dp"
+android:layout_height="120dp"
+android:layout_marginTop="10dp"
+android:layout_marginLeft="5dp"
+android:orientation="vertical"
+android:background="@drawable/blue_rounded_box">
+
+<TextView
+    android:id="@+id/mentor_name"
+    android:layout_width="wrap_content"
+    android:layout_height="wrap_content"
+    android:layout_gravity="center_horizontal"
+    android:layout_marginTop="30dp"
+    android:text="John Cooper"
+    android:textColor="@color/white"
+    android:textSize="12sp"/>
+
+<LinearLayout
+    android:layout_width="wrap_content"
+    android:layout_height="wrap_content"
+    android:layout_gravity="center_horizontal"
+    android:layout_marginTop="5dp"
+    android:orientation="horizontal">
+
+    <ImageView
+        android:id="@+id/starone"
+        android:layout_marginHorizontal="1dp"
+        android:layout_width="10dp"
+        android:layout_height="10dp"
+        android:src="@drawable/gold_star"/>
+    <ImageView
+        android:id="@+id/startwo"
+        android:layout_marginHorizontal="1dp"
+        android:layout_width="10dp"
+        android:layout_height="10dp"
+        android:src="@drawable/gold_star"/>
+    <ImageView
+        android:id="@+id/starthree"
+        android:layout_marginHorizontal="1dp"
+        android:layout_width="10dp"
+        android:layout_height="10dp"
+        android:background="@drawable/gold_star"/>
+    <ImageView
+        android:id="@+id/starfour"
+        android:layout_marginHorizontal="1dp"
+        android:layout_width="10dp"
+        android:layout_height="10dp"
+        android:background="@drawable/gold_star"/>
+    <ImageView
+        android:id="@+id/starfive"
+        android:layout_marginHorizontal="1dp"
+        android:layout_width="10dp"
+        android:layout_height="10dp"
+        android:background="@drawable/gold_star_unfilled"/>
+</LinearLayout>
+
+<TextView
+    android:id="@+id/review_description"
+    android:layout_width="wrap_content"
+    android:layout_height="wrap_content"
+    android:layout_gravity="center_horizontal"
+    android:layout_marginTop="5dp"
+    android:text="John provided excellent\nprototyping techniques\nand insights. I highly\nrecommend him!"
+    android:textSize="8sp"/>
+
+</LinearLayout>

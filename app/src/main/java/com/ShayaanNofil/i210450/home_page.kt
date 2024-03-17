@@ -39,8 +39,10 @@ class home_page : AppCompatActivity() {
 
         val recycle_topmentor: RecyclerView = findViewById(R.id.recycle_top_mentors)
         val recycle_education: RecyclerView = findViewById(R.id.recycle_education)
-        recycle_topmentor.layoutManager = LinearLayoutManager(this,LinearLayoutManager.HORIZONTAL, true)
-        recycle_education.layoutManager = LinearLayoutManager(this,LinearLayoutManager.HORIZONTAL, true)
+        val recycle_recent: RecyclerView = findViewById(R.id.recycle_recent)
+        recycle_topmentor.layoutManager = LinearLayoutManager(this,LinearLayoutManager.HORIZONTAL, false)
+        recycle_education.layoutManager = LinearLayoutManager(this,LinearLayoutManager.HORIZONTAL, false)
+        recycle_recent.layoutManager = LinearLayoutManager(this,LinearLayoutManager.HORIZONTAL, false)
         val mentorarray: MutableList<Mentors> = mutableListOf()
 
         FirebaseDatabase.getInstance().getReference("Mentor").addValueEventListener(object: ValueEventListener{
@@ -55,6 +57,7 @@ class home_page : AppCompatActivity() {
                     val adapter = homerecycle_adapter(mentorarray)
                     recycle_topmentor.adapter = adapter
                     recycle_education.adapter = adapter
+                    recycle_recent.adapter = adapter
 
                     adapter.setOnClickListener(object :
                         homerecycle_adapter.OnClickListener {
