@@ -35,7 +35,6 @@ class homerecycle_adapter(private val items: MutableList<Mentors>): RecyclerView
         return items.size
     }
     override fun onBindViewHolder(holder: ViewHolder, position: Int) {
-        Log.w("TAG", "In onbind holder")
         val mentor = items[position]
 
         holder.mentorname.text = mentor.name

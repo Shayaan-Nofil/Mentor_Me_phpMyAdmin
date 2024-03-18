@@ -15,6 +15,7 @@ import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.database.DatabaseReference
 import com.google.firebase.database.FirebaseDatabase
 import com.google.firebase.storage.FirebaseStorage
+import kotlin.random.Random
 
 private lateinit var storage: FirebaseStorage
 private lateinit var database: DatabaseReference
@@ -44,12 +45,12 @@ class addnew_mentor : AppCompatActivity() {
             mentor.status = mentorstat.selectedItem.toString()
 
             storage = FirebaseStorage.getInstance()
-            val storageref = storage.getReference("Images")
+            val storageref = storage.reference
             database = FirebaseDatabase.getInstance().getReference("Mentor")
 
             if (mentorimgUri != null){
                 Log.w("TAG", "Uploading")
-                storageref.putFile(mentorimgUri!!).addOnSuccessListener {
+                storageref.child(mentor.name + Random.nextInt(0,100000).toString()).putFile(mentorimgUri!!).addOnSuccessListener {
                     it.metadata!!.reference!!.downloadUrl.addOnSuccessListener {task ->
                         mentor.profilepic = task.toString()
                         Log.w("TAG", "Upload Success")

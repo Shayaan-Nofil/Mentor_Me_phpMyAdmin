@@ -36,7 +36,7 @@ class review_recycle_adapter(private val items: MutableList<Reviews>): RecyclerV
         return items.size
     }
     override fun onBindViewHolder(holder: ViewHolder, position: Int) {
-        Log.w("TAG", "In onbind holder")
+
         val review = items[position]
 
         holder.mentorname.text = review.mentorname

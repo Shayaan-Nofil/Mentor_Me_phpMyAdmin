@@ -7,7 +7,16 @@
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:background="#cbcbcb">
+
+        <FrameLayout
+            android:id="@+id/remote_user"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:orientation="vertical"
+            android:layout_marginBottom="170dp"/>
+
         <TextView
+            android:id="@+id/call_duration"
             android:text="50:08"
             android:textSize="15sp"
             android:textColor="@color/black"
@@ -17,7 +26,9 @@
             android:layout_centerHorizontal="true"
             android:layout_marginTop="80dp"/>
 
-        <ImageView
+
+        <FrameLayout
+            android:id="@+id/local_user"
             android:layout_width="100dp"
             android:layout_height="160dp"
             android:background="@drawable/white_rounded_rectangle"

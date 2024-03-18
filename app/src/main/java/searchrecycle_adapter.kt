@@ -32,7 +32,6 @@ class searchrecycle_adapter(private val items: MutableList<Mentors>): RecyclerVi
         return items.size
     }
     override fun onBindViewHolder(holder: searchrecycle_adapter.ViewHolder, position: Int) {
-        Log.w("TAG", "In onbind holder")
         val mentor = items[position]
 
         holder.mentorname.text = mentor.name

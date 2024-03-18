@@ -27,7 +27,7 @@ class search_results : AppCompatActivity() {
         recycle_topmentor.layoutManager = LinearLayoutManager(this)
 
         val mentorarray: MutableList<Mentors> = mutableListOf()
-        Log.w("TAG", mentorname!!)
+        Log.w("TAG", mentorname)
 
         FirebaseDatabase.getInstance().getReference("Mentor").addValueEventListener(object:
             ValueEventListener {

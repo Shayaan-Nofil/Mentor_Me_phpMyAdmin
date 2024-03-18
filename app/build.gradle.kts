@@ -41,6 +41,7 @@ android {
 
 dependencies {
 
+    implementation ("io.agora.rtc:voice-sdk:4.2.6")
     implementation ("com.github.bumptech.glide:glide:4.8.0")
     implementation("com.google.firebase:firebase-inappmessaging-display:20.4.0")
     annotationProcessor ("com.github.bumptech.glide:compiler:4.8.0")

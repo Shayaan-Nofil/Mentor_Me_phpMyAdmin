@@ -3,6 +3,7 @@ package com.ShayaanNofil.i210450
 import Mentors
 import Reviews
 import User
+import android.content.DialogInterface
 import android.content.Intent
 import android.net.Uri
 import androidx.appcompat.app.AppCompatActivity
@@ -13,6 +14,7 @@ import android.widget.Button
 import android.widget.ImageView
 import android.widget.TextView
 import androidx.activity.result.contract.ActivityResultContracts
+import androidx.appcompat.app.AlertDialog
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.bumptech.glide.Glide
@@ -26,6 +28,7 @@ import com.google.firebase.database.FirebaseDatabase
 import com.google.firebase.database.ValueEventListener
 import com.google.firebase.storage.FirebaseStorage
 import de.hdodenhof.circleimageview.CircleImageView
+import kotlin.random.Random
 
 private lateinit var storage: FirebaseStorage
 private lateinit var database: DatabaseReference
@@ -61,7 +64,6 @@ class profile_page : AppCompatActivity() {
                 usr.profilepic = snapshot.child("profilepic").value.toString()
                 usr.bgpic = snapshot.child("bgpic").value.toString()
                 nametext.text = usr.name
-                usr.profilepic = usr.profilepic
                 usr.bgpic = usr.bgpic
                 updateimg()
             }
@@ -142,9 +144,7 @@ class profile_page : AppCompatActivity() {
 
         val editprofile : Button = findViewById(R.id.bt_settings)
         editprofile.setOnClickListener(View.OnClickListener {
-            val temp = Intent(this, edit_profile::class.java )
-            startActivity(temp)
-            //Firebase.auth.signOut()
+            showOptionsDialog()
         })
 
         val backbutton=findViewById<View>(R.id.back_button)
@@ -215,11 +215,11 @@ class profile_page : AppCompatActivity() {
 
     private fun updateprofilepic(){
         storage = FirebaseStorage.getInstance()
-        val storageref = storage.getReference("Images")
+        val storageref = storage.reference
         val userId = mAuth.uid;
 
         profilePictureUri?. let{
-            storageref.child(userId!!).putFile(profilePictureUri!!).addOnSuccessListener {
+            storageref.child(userId!! + Random.nextInt(0,100000).toString()).putFile(profilePictureUri!!).addOnSuccessListener {
                 it.metadata!!.reference!!.downloadUrl.addOnSuccessListener {task ->
                     usr.profilepic = task.toString()
                     Log.w("TAG", "Upload Success")
@@ -236,11 +236,11 @@ class profile_page : AppCompatActivity() {
 
     private fun updatebackgroundpic(){
         storage = FirebaseStorage.getInstance()
-        val storageref = storage.getReference("Images")
+        val storageref = storage.reference
         val userId = mAuth.uid;
 
         backPictureUri?. let{
-            storageref.child(userId!!).putFile(backPictureUri!!).addOnSuccessListener {
+            storageref.child(userId!! + Random.nextInt(0,100000).toString()).putFile(backPictureUri!!).addOnSuccessListener {
                 it.metadata!!.reference!!.downloadUrl.addOnSuccessListener {task ->
                     usr.bgpic = task.toString()
                     Log.w("TAG", "Upload Success")
@@ -265,5 +265,26 @@ class profile_page : AppCompatActivity() {
                 .load(usr.bgpic)
                 .into(bgpicimg)
         }
+    }
+
+    private fun showOptionsDialog() {
+        val options = arrayOf("Edit Profile", "Logout")
+        val builder = AlertDialog.Builder(this)
+        builder.setTitle("Options")
+        builder.setItems(options) { dialogInterface: DialogInterface, which: Int ->
+            when (which) {
+                0 -> {
+                    startActivity(Intent(this, edit_profile::class.java))
+                }
+                1 -> {
+                    FirebaseAuth.getInstance().signOut()
+                    val intent = Intent(this, Log_in_page::class.java)
+                    intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP or Intent.FLAG_ACTIVITY_NEW_TASK)
+                    startActivity(intent)
+                    finish()
+                }
+            }
+        }
+        builder.create().show()
     }
 }
