@@ -17,7 +17,8 @@
         android:padding="10dp"
         android:text="Sample Text"
         android:textSize="12sp"
-        android:textColor="@color/black"/>
+        android:textColor="@color/black"
+        android:autoLink="all" />
 
     <TextView
         android:id="@+id/message_time"

@@ -124,8 +124,8 @@
                     android:id="@+id/btvcrec"
                     android:layout_marginTop="3dp"
                     android:background="@drawable/mic_icon_white"
-                    android:layout_width="30dp"
-                    android:layout_height="30dp" />
+                    android:layout_width="35dp"
+                    android:layout_height="35dp"/>
 
                 <Button
                     android:id="@+id/btsend"

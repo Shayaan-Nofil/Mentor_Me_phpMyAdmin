@@ -41,9 +41,16 @@ android {
 
 dependencies {
 
+    implementation ("androidx.camera:camera-core:1.2.2")
+    implementation ("androidx.camera:camera-camera2:1.2.2")
+    implementation ("androidx.camera:camera-lifecycle:1.2.2")
+    implementation ("androidx.camera:camera-video:1.2.2")
+    implementation ("androidx.camera:camera-view:1.2.2")
+    implementation ("androidx.camera:camera-extensions:1.2.2")
     implementation ("io.agora.rtc:voice-sdk:4.2.6")
     implementation ("com.github.bumptech.glide:glide:4.8.0")
     implementation("com.google.firebase:firebase-inappmessaging-display:20.4.0")
+    implementation("androidx.camera:camera-view:1.3.2")
     annotationProcessor ("com.github.bumptech.glide:compiler:4.8.0")
     implementation ("com.firebaseui:firebase-ui-storage:7.2.0")
     implementation("com.google.firebase:firebase-analytics")

@@ -22,6 +22,11 @@
             android:layout_weight="6"
             android:background="#cbcbcb">
 
+            <androidx.camera.view.PreviewView
+                android:id="@+id/camera_preview"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"/>
+
             <ImageView
                 android:layout_width="match_parent"
                 android:layout_height="45dp"
