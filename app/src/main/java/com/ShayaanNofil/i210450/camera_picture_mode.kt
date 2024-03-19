@@ -67,11 +67,24 @@ class camera_picture_mode : AppCompatActivity() {
 
         // Set up the listener for take photo button
         val cameraCaptureButton: Button = findViewById(R.id.shutter_button)
-        cameraCaptureButton.setOnClickListener { takePhoto() }
+        cameraCaptureButton.setOnClickListener {
+            takePhoto()
+        }
 
         outputDirectory = getOutputDirectory()
-
         cameraExecutor = Executors.newSingleThreadExecutor()
+
+        var videobutton: Button = findViewById(R.id.video_button)
+        videobutton.setOnClickListener{
+            val intent = Intent(this, camera_video_mode::class.java)
+            val bundle = Bundle()
+            bundle.putSerializable("chatdata", chat)
+            intent.putExtras(bundle)
+            intent.putExtra("chatdata", chat)
+            startActivity(intent)
+            finish()
+        }
+
     }
 
     private fun startCamera() {
@@ -145,58 +158,61 @@ class camera_picture_mode : AppCompatActivity() {
     }
 
     private fun uploadImageToFirestore(uri: Uri) {
-        var message = Messages()
-        var mAuth = Firebase.auth
-        message!!.senderid = mAuth.uid.toString()
-        message!!.time = SimpleDateFormat("HH:mm").format(Date())
-        message!!.tag = "image"
+        Thread(Runnable {
+            var message = Messages()
+            var mAuth = Firebase.auth
+            message!!.senderid = mAuth.uid.toString()
+            message!!.time = SimpleDateFormat("HH:mm").format(Date())
+            message!!.tag = "image"
 
-        val storageref = FirebaseStorage.getInstance().reference
+            val storageref = FirebaseStorage.getInstance().reference
 
-        storageref.child("Chats").child(chat!!.id + Random.nextInt(0,100000).toString()).putFile(uri).addOnSuccessListener {
-            it.metadata!!.reference!!.downloadUrl.addOnSuccessListener {task ->
-                message.content = task.toString()
-                Log.w("TAG", "Upload Success")
+            storageref.child("Chats").child(chat!!.id + Random.nextInt(0,100000).toString()).putFile(uri).addOnSuccessListener {
+                it.metadata!!.reference!!.downloadUrl.addOnSuccessListener {task ->
+                    message.content = task.toString()
+                    Log.w("TAG", "Upload Success")
 
-                FirebaseDatabase.getInstance().getReference("User").child(mAuth.uid.toString()).addListenerForSingleValueEvent(object:
-                    ValueEventListener {
-                    override fun onDataChange(snapshot: DataSnapshot) {
-                        if (snapshot.exists()) {
-                            val user = snapshot.getValue(User::class.java)
-                            if (user != null) {
-                                Log.w("TAG", "in user, getting url")
-                                message.senderpic = user.profilepic.toString()
+                    FirebaseDatabase.getInstance().getReference("User").child(mAuth.uid.toString()).addListenerForSingleValueEvent(object:
+                        ValueEventListener {
+                        override fun onDataChange(snapshot: DataSnapshot) {
+                            if (snapshot.exists()) {
+                                val user = snapshot.getValue(User::class.java)
+                                if (user != null) {
+                                    Log.w("TAG", "in user, getting url")
+                                    message.senderpic = user.profilepic.toString()
 
-                                FirebaseDatabase.getInstance().getReference("Chat").child(chat!!.id).child("Messages").push().setValue(message)
-                                finish()
+                                    FirebaseDatabase.getInstance().getReference("Chat").child(chat!!.id).child("Messages").push().setValue(message)
+                                    finish()
+                                }
                             }
-                        }
-                        else {
-                            FirebaseDatabase.getInstance().getReference("Mentor").child(mAuth.uid.toString()).addListenerForSingleValueEvent(object :
-                                ValueEventListener {
-                                override fun onDataChange(snapshot: DataSnapshot) {
-                                    if (snapshot.exists()) {
-                                        val user = snapshot.getValue(Mentors::class.java)
-                                        if (user != null) {
-                                            Log.w("TAG", "in mentor, getting url")
-                                            message.senderpic = user.profilepic.toString()
+                            else {
+                                FirebaseDatabase.getInstance().getReference("Mentor").child(mAuth.uid.toString()).addListenerForSingleValueEvent(object :
+                                    ValueEventListener {
+                                    override fun onDataChange(snapshot: DataSnapshot) {
+                                        if (snapshot.exists()) {
+                                            val user = snapshot.getValue(Mentors::class.java)
+                                            if (user != null) {
+                                                Log.w("TAG", "in mentor, getting url")
+                                                message.senderpic = user.profilepic.toString()
 
-                                            FirebaseDatabase.getInstance().getReference("Chat").child(chat!!.id).child("Messages").push().setValue(message)
-                                            finish()
+                                                FirebaseDatabase.getInstance().getReference("Chat").child(chat!!.id).child("Messages").push().setValue(message)
+                                                finish()
+                                            }
                                         }
                                     }
-                                }
-                                override fun onCancelled(error: DatabaseError) {}
-                            })
+                                    override fun onCancelled(error: DatabaseError) {}
+                                })
+                            }
                         }
-                    }
-                    override fun onCancelled(error: DatabaseError) {}
-                })
+                        override fun onCancelled(error: DatabaseError) {}
+                    })
+                }
+            }.addOnFailureListener{
+                Log.w("TAG", "Upload failed")
             }
-        }.addOnFailureListener{
-            Log.w("TAG", "Upload failed")
-        }
+        }).start()
 
+        finish()
     }
 
     private fun allPermissionsGranted() = REQUIRED_PERMISSIONS.all {

@@ -202,6 +202,7 @@ class individual_chat : AppCompatActivity() {
             startActivity(temp)
         })
 
+        //Camera picture
         val uppic=findViewById<View>(R.id.btcamera)
         uppic.setOnClickListener(View.OnClickListener {
             val temp = Intent(this, camera_picture_mode::class.java )
@@ -211,6 +212,7 @@ class individual_chat : AppCompatActivity() {
             startActivity(temp)
         })
 
+        //Voice Recording
         val vcrecbutton: ImageButton = findViewById(R.id.btvcrec)
         vcrecbutton.setOnClickListener() {
             if (!recording){

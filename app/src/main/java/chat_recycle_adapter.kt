@@ -120,7 +120,34 @@ class chat_recycle_adapter(private val items: MutableList<Messages>): RecyclerVi
             params.width = 500 // replace with desired width in pixels
             params.height = 300 // replace with desired height in pixels
             holder.messagecontent.layoutParams = params
-            holder.messagecontent.text = message.content
+            val content = "Audio\n" + message.content
+            holder.messagecontent.text = content
+            holder.messagetime.text = message.time
+
+            if (message.senderid == mAuth.uid.toString()){
+                val view = LayoutInflater.from(holder.itemView.context).inflate(R.layout.chat_message_sent_recycle, null)
+                holder.messagecontent = view.findViewById(R.id.message_content)
+            }
+            else{
+                message.senderpic.let { senderpic ->
+                    holder.senderimg?.let { senderimg ->
+                        Glide.with(holder.itemView)
+                            .load(senderpic)
+                            .into(senderimg)
+                    }
+                }
+
+                val view = LayoutInflater.from(holder.itemView.context).inflate(R.layout.chat_message_reccieved_recycle, null)
+                holder.messagecontent = view.findViewById(R.id.message_content)
+
+            }
+        }else if (message.tag == "video"){
+            val params = holder.messagecontent.layoutParams
+            params.width = 500 // replace with desired width in pixels
+            params.height = 300 // replace with desired height in pixels
+            holder.messagecontent.layoutParams = params
+            val content = "Video\n" + message.content
+            holder.messagecontent.text = content
             holder.messagetime.text = message.time
 
             if (message.senderid == mAuth.uid.toString()){
