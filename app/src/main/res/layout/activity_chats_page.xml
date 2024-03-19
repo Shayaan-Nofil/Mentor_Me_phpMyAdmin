@@ -74,14 +74,11 @@
 
         </LinearLayout>
 
-        <ScrollView
+        <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="0dp"
-            android:layout_weight="6">
-            <LinearLayout
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:orientation="vertical">
+            android:layout_weight="6"
+            android:orientation="vertical">
 
                 <TextView
                     android:layout_width="wrap_content"
@@ -92,108 +89,15 @@
                     android:textSize="12sp"/>
 
                 <androidx.recyclerview.widget.RecyclerView
-                    android:id="@+id/recycler_view"
+                    android:id="@+id/chatpage_recycler_view"
                     android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
+                    android:layout_height="match_parent"
                     android:clickable="true">
 
 
                 </androidx.recyclerview.widget.RecyclerView>
-                <ImageView
-                    android:layout_marginTop="10dp"
-                    android:layout_width="match_parent"
-                    android:layout_height="2dp"
-                    android:src="#b9dfe0"/>
 
-                <LinearLayout
-                    android:id="@+id/jack_message_chat"
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:orientation="horizontal"
-                    android:layout_marginTop="20dp"
-                    android:layout_marginStart="10dp"
-                    android:clickable="true">
-                    <de.hdodenhof.circleimageview.CircleImageView
-                        android:layout_width="70dp"
-                        android:layout_height="70dp"
-                        android:src="@drawable/jack_circle"/>
-
-                    <LinearLayout
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:orientation="vertical">
-                        <TextView
-                            android:layout_width="wrap_content"
-                            android:layout_height="wrap_content"
-                            android:layout_marginTop="15dp"
-                            android:layout_marginStart="20dp"
-                            android:text="Jack Watson"
-                            android:textSize="20sp"
-                            android:textColor="#156f77"
-                            android:textStyle="bold"/>
-                        <TextView
-                            android:layout_width="wrap_content"
-                            android:layout_height="wrap_content"
-                            android:layout_marginStart="20dp"
-                            android:layout_marginTop="2sp"
-                            android:text="No new message"
-                            android:textSize="10sp"
-                            android:textColor="#ABABAB"/>
-                    </LinearLayout>
-
-                </LinearLayout>
-                <ImageView
-                    android:layout_marginTop="10dp"
-                    android:layout_width="match_parent"
-                    android:layout_height="2dp"
-                    android:src="#b9dfe0"/>
-
-                <LinearLayout
-                    android:id="@+id/emma_message_chat"
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:orientation="horizontal"
-                    android:layout_marginTop="20dp"
-                    android:layout_marginStart="10dp"
-                    android:clickable="true">
-                    <de.hdodenhof.circleimageview.CircleImageView
-                        android:layout_width="70dp"
-                        android:layout_height="70dp"
-                        android:src="@drawable/emma1"/>
-
-                    <LinearLayout
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:orientation="vertical">
-                        <TextView
-                            android:layout_width="wrap_content"
-                            android:layout_height="wrap_content"
-                            android:layout_marginTop="15dp"
-                            android:layout_marginStart="20dp"
-                            android:text="Emma Phillips"
-                            android:textSize="20sp"
-                            android:textColor="#156f77"
-                            android:textStyle="bold"/>
-                        <TextView
-                            android:layout_width="wrap_content"
-                            android:layout_height="wrap_content"
-                            android:layout_marginStart="20dp"
-                            android:layout_marginTop="2sp"
-                            android:text="No new message"
-                            android:textSize="10sp"
-                            android:textColor="#ABABAB"/>
-                    </LinearLayout>
-
-                </LinearLayout>
-                <ImageView
-                    android:layout_marginTop="10dp"
-                    android:layout_width="match_parent"
-                    android:layout_height="2dp"
-                    android:src="#b9dfe0"/>
-
-
-            </LinearLayout>
-        </ScrollView>
+        </LinearLayout>
 
     </LinearLayout>
 

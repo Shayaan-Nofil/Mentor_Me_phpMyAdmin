@@ -3,6 +3,7 @@ package com.ShayaanNofil.i210450
 import Chats
 import Mentors
 import Messages
+import User
 import android.annotation.SuppressLint
 import android.content.Intent
 import android.graphics.Bitmap
@@ -53,35 +54,74 @@ class individual_chat : AppCompatActivity() {
         val chat: Chats = intent.getSerializableExtra("object") as Chats
 
         var chattername : TextView = findViewById(R.id.chatter_name)
-        database = FirebaseDatabase.getInstance().getReference("Mentor")
-//        var mentorid : String = ""
-//        var mentorpic: String = ""
+        mAuth = Firebase.auth
 
-        database.addListenerForSingleValueEvent(object: ValueEventListener {
+        //Get the appropriate name of the chatter
+        FirebaseDatabase.getInstance().getReference("User").child(mAuth.uid.toString()).addListenerForSingleValueEvent(object: ValueEventListener {
             override fun onDataChange(snapshot: DataSnapshot) {
                 if (snapshot.exists()) {
-                    for (data in snapshot.children) {
-                        val mentor = data.getValue(Mentors::class.java)
-                        if (mentor != null) {
-                            FirebaseDatabase.getInstance().getReference("Mentor").child(mentor.id!!).child("Chats").addListenerForSingleValueEvent(object : ValueEventListener {
-                                override fun onDataChange(snapshot: DataSnapshot) {
-                                    if (snapshot.exists()) {
-                                        for (data in snapshot.children) {
-                                            val chat = data.getValue(String::class.java)
-                                            if (chat != null) {
-                                                if (chat == mentor.id) {
-                                                    chattername.text = mentor.name
-//                                                    mentorid = mentor.id
-//                                                    mentorpic = mentor.profilepic.toString()
+                    Log.w("TAG", "User is a user")
+                    database = FirebaseDatabase.getInstance().getReference("Mentor")
+
+                    database.addListenerForSingleValueEvent(object: ValueEventListener {
+                        override fun onDataChange(snapshot: DataSnapshot) {
+                            if (snapshot.exists()) {
+                                for (data in snapshot.children) {
+                                    val mentor = data.getValue(Mentors::class.java)
+                                    if (mentor != null) {
+                                        FirebaseDatabase.getInstance().getReference("Mentor").child(mentor.id!!).child("Chats").addListenerForSingleValueEvent(object : ValueEventListener {
+                                            override fun onDataChange(snapshot: DataSnapshot) {
+                                                if (snapshot.exists()) {
+                                                    for (data in snapshot.children) {
+                                                        val chats = data.getValue(String::class.java)
+                                                        if (chats != null) {
+                                                            if (chats == chat.id) {
+                                                                chattername.text = mentor.name
+                                                            }
+                                                        }
+                                                    }
                                                 }
                                             }
-                                        }
+                                            override fun onCancelled(error: DatabaseError) {}
+                                        })
                                     }
                                 }
-                                override fun onCancelled(error: DatabaseError) {}
-                            })
+                            }
                         }
-                    }
+                        override fun onCancelled(error: DatabaseError) {}
+                    })
+                }
+                else{
+                    Log.w("TAG", "User is a mentor")
+
+                        FirebaseDatabase.getInstance().getReference("User").addListenerForSingleValueEvent(object: ValueEventListener {
+                        override fun onDataChange(snapshot: DataSnapshot) {
+                            if (snapshot.exists()) {
+                                for (data in snapshot.children) {
+                                    val mentor = data.getValue(User::class.java)
+                                    if (mentor != null) {
+                                        FirebaseDatabase.getInstance().getReference("User").child(mentor.id!!).child("Chats").addListenerForSingleValueEvent(object : ValueEventListener {
+                                            override fun onDataChange(snapshot: DataSnapshot) {
+                                                Log.w("TAG", "Mentor | Got chats")
+                                                if (snapshot.exists()) {
+                                                    for (data in snapshot.children) {
+                                                        val chats = data.getValue(String::class.java)
+                                                        if (chats != null) {
+                                                            if (chats == chat.id) {
+                                                                chattername.text = mentor.name
+                                                            }
+                                                        }
+                                                    }
+                                                }
+                                            }
+                                            override fun onCancelled(error: DatabaseError) {}
+                                        })
+                                    }
+                                }
+                            }
+                        }
+                        override fun onCancelled(error: DatabaseError) {}
+                    })
                 }
             }
             override fun onCancelled(error: DatabaseError) {}
@@ -118,7 +158,7 @@ class individual_chat : AppCompatActivity() {
         btsend.setOnClickListener(View.OnClickListener {
             var message: Messages = Messages()
             mAuth = Firebase.auth
-            if (messages == null){
+            if (messages == null){ //Text Messages
                 val messagecontent : EditText = findViewById(R.id.message_text)
                 message.content = messagecontent.text.toString()
                 messagecontent.setText("")
@@ -138,11 +178,28 @@ class individual_chat : AppCompatActivity() {
                                 FirebaseDatabase.getInstance().getReference("Chat").child(chat.id).child("Messages").push().setValue(message)
                             }
                         }
+                        else{
+                            FirebaseDatabase.getInstance().getReference("Mentor").child(mAuth.uid.toString()).addListenerForSingleValueEvent(object: ValueEventListener {
+                                override fun onDataChange(snapshot: DataSnapshot) {
+                                    if (snapshot.exists()) {
+                                        val user = snapshot.getValue(Mentors::class.java)
+                                        if (user != null) {
+                                            Log.w("TAG", "in mentor, getting url")
+                                            Log.w("TAG", user.profilepic.toString())
+                                            message.senderpic = user.profilepic.toString()
+
+                                            FirebaseDatabase.getInstance().getReference("Chat").child(chat.id).child("Messages").push().setValue(message)
+                                        }
+                                    }
+                                }
+                                override fun onCancelled(error: DatabaseError) {}
+                            })
+                        }
                     }
                     override fun onCancelled(error: DatabaseError) {}
                 })
             }
-            else{
+            else{ //Other messages
                 messages!!.senderid = mAuth.uid.toString()
                 messages!!.time = SimpleDateFormat("HH:mm").format(Date())
                 message = messages!!

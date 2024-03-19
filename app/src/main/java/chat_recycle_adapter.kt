@@ -58,6 +58,7 @@ class chat_recycle_adapter(private val items: MutableList<Messages>): RecyclerVi
             params.width = 400 // replace with desired width in pixels
             params.height = 533 // replace with desired height in pixels
             holder.messagecontent.layoutParams = params
+            holder.messagetime.text = message.time
 
             Glide.with(holder.itemView)
                 .asBitmap()
