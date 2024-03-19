@@ -16,10 +16,12 @@ import com.google.firebase.auth.auth
 import de.hdodenhof.circleimageview.CircleImageView
 import com.bumptech.glide.request.target.CustomTarget
 import com.bumptech.glide.request.transition.Transition
+import java.text.SimpleDateFormat
+import java.util.Locale
 
 private lateinit var mAuth: FirebaseAuth
 class chat_recycle_adapter(private val items: MutableList<Messages>): RecyclerView.Adapter<chat_recycle_adapter.ViewHolder>() {
-
+    private lateinit var onClickListener: chat_recycle_adapter.OnClickListener
     class ViewHolder (itemview: View): RecyclerView.ViewHolder(itemview){
         val senderimg: CircleImageView? = itemView.findViewById(R.id.sender_img)
         var messagecontent: TextView = itemView.findViewById(R.id.message_content)
@@ -58,7 +60,11 @@ class chat_recycle_adapter(private val items: MutableList<Messages>): RecyclerVi
             params.width = 400 // replace with desired width in pixels
             params.height = 533 // replace with desired height in pixels
             holder.messagecontent.layoutParams = params
-            holder.messagetime.text = message.time
+            val originalFormat = SimpleDateFormat("EEE MMM dd HH:mm:ss zzz yyyy", Locale.getDefault())
+            val targetFormat = SimpleDateFormat("HH:mm", Locale.getDefault())
+            val date = originalFormat.parse(message.time)
+            val formattedDate = targetFormat.format(date!!)
+            holder.messagetime.text = formattedDate
             holder.messagecontent.text = ""
 
             Glide.with(holder.itemView)
@@ -95,7 +101,11 @@ class chat_recycle_adapter(private val items: MutableList<Messages>): RecyclerVi
         }
         else if (message.tag == "text"){
             holder.messagecontent.text = message.content
-            holder.messagetime.text = message.time
+            val originalFormat = SimpleDateFormat("EEE MMM dd HH:mm:ss zzz yyyy", Locale.getDefault())
+            val targetFormat = SimpleDateFormat("HH:mm", Locale.getDefault())
+            val date = originalFormat.parse(message.time)
+            val formattedDate = targetFormat.format(date!!)
+            holder.messagetime.text = formattedDate
 
             if (message.senderid == mAuth.uid.toString()){
                 val view = LayoutInflater.from(holder.itemView.context).inflate(R.layout.chat_message_sent_recycle, null)
@@ -122,7 +132,11 @@ class chat_recycle_adapter(private val items: MutableList<Messages>): RecyclerVi
             holder.messagecontent.layoutParams = params
             val content = "Audio\n" + message.content
             holder.messagecontent.text = content
-            holder.messagetime.text = message.time
+            val originalFormat = SimpleDateFormat("EEE MMM dd HH:mm:ss zzz yyyy", Locale.getDefault())
+            val targetFormat = SimpleDateFormat("HH:mm", Locale.getDefault())
+            val date = originalFormat.parse(message.time)
+            val formattedDate = targetFormat.format(date!!)
+            holder.messagetime.text = formattedDate
 
             if (message.senderid == mAuth.uid.toString()){
                 val view = LayoutInflater.from(holder.itemView.context).inflate(R.layout.chat_message_sent_recycle, null)
@@ -141,14 +155,19 @@ class chat_recycle_adapter(private val items: MutableList<Messages>): RecyclerVi
                 holder.messagecontent = view.findViewById(R.id.message_content)
 
             }
-        }else if (message.tag == "video"){
+        }
+        else if (message.tag == "video"){
             val params = holder.messagecontent.layoutParams
             params.width = 500 // replace with desired width in pixels
             params.height = 300 // replace with desired height in pixels
             holder.messagecontent.layoutParams = params
             val content = "Video\n" + message.content
             holder.messagecontent.text = content
-            holder.messagetime.text = message.time
+            val originalFormat = SimpleDateFormat("EEE MMM dd HH:mm:ss zzz yyyy", Locale.getDefault())
+            val targetFormat = SimpleDateFormat("HH:mm", Locale.getDefault())
+            val date = originalFormat.parse(message.time)
+            val formattedDate = targetFormat.format(date!!)
+            holder.messagetime.text = formattedDate
 
             if (message.senderid == mAuth.uid.toString()){
                 val view = LayoutInflater.from(holder.itemView.context).inflate(R.layout.chat_message_sent_recycle, null)
@@ -169,5 +188,17 @@ class chat_recycle_adapter(private val items: MutableList<Messages>): RecyclerVi
             }
         }
 
+        holder.itemView.setOnClickListener {
+            onClickListener.onClick(position, message)
+        }
+    }
+    // A function to bind the onclickListener.
+
+    fun setOnClickListener(onClickListener: OnClickListener) {
+        this.onClickListener = onClickListener
+    }
+    // onClickListener Interface
+    interface OnClickListener {
+        fun onClick(position: Int, model: Messages)
     }
 }

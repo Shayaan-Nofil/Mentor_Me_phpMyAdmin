@@ -220,7 +220,7 @@ class camera_video_mode : AppCompatActivity() {
             val message = Messages()
             val mAuth = Firebase.auth
             message.senderid = mAuth.uid.toString()
-            message.time = SimpleDateFormat("HH:mm").format(Date())
+            message.time = Calendar.getInstance().time.toString()
             message.tag = "video"
 
             val storageref = FirebaseStorage.getInstance().reference
@@ -239,7 +239,8 @@ class camera_video_mode : AppCompatActivity() {
                                     Log.w("TAG", "in user, getting url")
                                     message.senderpic = user.profilepic.toString()
 
-                                    FirebaseDatabase.getInstance().getReference("Chat").child(chat!!.id).child("Messages").push().setValue(message)
+                                    message.id = FirebaseDatabase.getInstance().getReference("Chat").child(chat!!.id).child("Messages").push().key.toString()
+                                    FirebaseDatabase.getInstance().getReference("Chat").child(chat!!.id).child("Messages").child(message.id).setValue(message)
                                     finish()
                                 }
                             }
@@ -253,7 +254,8 @@ class camera_video_mode : AppCompatActivity() {
                                                 Log.w("TAG", "in mentor, getting url")
                                                 message.senderpic = user.profilepic.toString()
 
-                                                FirebaseDatabase.getInstance().getReference("Chat").child(chat!!.id).child("Messages").push().setValue(message)
+                                                message.id = FirebaseDatabase.getInstance().getReference("Chat").child(chat!!.id).child("Messages").push().key.toString()
+                                                FirebaseDatabase.getInstance().getReference("Chat").child(chat!!.id).child("Messages").child(message.id).setValue(message)
                                                 finish()
                                             }
                                         }

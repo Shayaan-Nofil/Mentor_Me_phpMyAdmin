@@ -6,6 +6,8 @@ import Messages
 import User
 import android.annotation.SuppressLint
 import android.app.Activity
+import android.content.Context
+import android.content.DialogInterface
 import android.content.Intent
 import android.database.ContentObserver
 import android.graphics.Bitmap
@@ -15,16 +17,23 @@ import android.media.MediaRecorder
 import android.net.Uri
 import android.os.Build
 import android.os.Bundle
+import android.os.VibrationEffect
+import android.os.Vibrator
 import android.provider.MediaStore
 import android.util.Log
+import android.view.KeyEvent
+import android.view.LayoutInflater
 import android.view.MotionEvent
 import android.view.View
 import android.view.WindowManager
+import android.widget.Button
 import android.widget.EditText
 import android.widget.ImageButton
 import android.widget.TextView
+import android.widget.Toast
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.annotation.RequiresApi
+import androidx.appcompat.app.AlertDialog
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.content.ContextCompat
 import androidx.recyclerview.widget.LinearLayoutManager
@@ -45,7 +54,9 @@ import com.google.firebase.storage.FirebaseStorage
 import java.io.File
 import java.io.IOException
 import java.text.SimpleDateFormat
+import java.util.Calendar
 import java.util.Date
+import java.util.Locale
 import kotlin.random.Random
 
 
@@ -171,6 +182,24 @@ class individual_chat : AppCompatActivity() {
                     }
                     val adapter = chat_recycle_adapter(messagearray)
                     recycle_topmentor.adapter = adapter
+
+                    adapter.setOnClickListener(object :
+                        chat_recycle_adapter.OnClickListener {
+                        @SuppressLint("ServiceCast")
+                        override fun onClick(position: Int, model: Messages) {
+                            val vibrator = getSystemService(Context.VIBRATOR_SERVICE) as Vibrator
+
+                            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+                                // For newer APIs
+                                vibrator.vibrate(VibrationEffect.createOneShot(100, VibrationEffect.DEFAULT_AMPLITUDE))
+                            } else {
+                                // For older APIs
+                                vibrator.vibrate(100)
+                            }
+
+                            showOptionsDialog(model)
+                        }
+                    })
                 }
             }
             override fun onCancelled(error: DatabaseError) {
@@ -182,6 +211,7 @@ class individual_chat : AppCompatActivity() {
         val btsend: android.widget.Button = findViewById(R.id.btsend)
         btsend.setOnClickListener(View.OnClickListener {
             uploadmessage()
+            screenshot = false
         })
 
         val backbutton: android.widget.Button = findViewById(R.id.back_button)
@@ -210,6 +240,7 @@ class individual_chat : AppCompatActivity() {
             bundle.putSerializable("chatdata", chat)
             temp.putExtras(bundle)
             startActivity(temp)
+            screenshot = false
         })
 
         //Voice Recording
@@ -225,6 +256,7 @@ class individual_chat : AppCompatActivity() {
                 vcrecbutton.setBackgroundResource(R.drawable.mic_icon_white)
                 stopRecording()
                 uploadAudio()
+                screenshot = false
             }
         }
 
@@ -294,9 +326,8 @@ class individual_chat : AppCompatActivity() {
                 val messagecontent : EditText = findViewById(R.id.message_text)
                 message.content = messagecontent.text.toString()
                 messagecontent.setText("")
-                screenshot = false
             }
-            message.time = SimpleDateFormat("HH:mm").format(Date())
+            message.time = Calendar.getInstance().time.toString()
             message.senderid = mAuth.uid.toString()
             message.tag = "text"
 
@@ -309,7 +340,8 @@ class individual_chat : AppCompatActivity() {
                             Log.w("TAG", user.profilepic.toString())
                             message.senderpic = user.profilepic.toString()
 
-                            FirebaseDatabase.getInstance().getReference("Chat").child(chat!!.id).child("Messages").push().setValue(message)
+                            message.id = FirebaseDatabase.getInstance().getReference("Chat").child(chat!!.id).child("Messages").push().key.toString()
+                            FirebaseDatabase.getInstance().getReference("Chat").child(chat!!.id).child("Messages").child(message.id).setValue(message)
                         }
                     }
                     else{
@@ -322,7 +354,8 @@ class individual_chat : AppCompatActivity() {
                                         Log.w("TAG", user.profilepic.toString())
                                         message.senderpic = user.profilepic.toString()
 
-                                        FirebaseDatabase.getInstance().getReference("Chat").child(chat!!.id).child("Messages").push().setValue(message)
+                                        message.id = FirebaseDatabase.getInstance().getReference("Chat").child(chat!!.id).child("Messages").push().key.toString()
+                                        FirebaseDatabase.getInstance().getReference("Chat").child(chat!!.id).child("Messages").child(message.id).setValue(message)
                                     }
                                 }
                             }
@@ -336,7 +369,7 @@ class individual_chat : AppCompatActivity() {
         else{ //Other messages
             screenshot = false
             messages!!.senderid = mAuth.uid.toString()
-            messages!!.time = SimpleDateFormat("HH:mm").format(Date())
+            messages!!.time = Calendar.getInstance().time.toString()
             message = messages!!
             messages = null
             uploadimgbt!!.background = ContextCompat.getDrawable(this, R.drawable.gallary_icon_white)
@@ -356,7 +389,8 @@ class individual_chat : AppCompatActivity() {
                                     Log.w("TAG", "in user, getting url")
                                     message.senderpic = user.profilepic.toString()
 
-                                    FirebaseDatabase.getInstance().getReference("Chat").child(chat!!.id).child("Messages").push().setValue(message)
+                                    message.id = FirebaseDatabase.getInstance().getReference("Chat").child(chat!!.id).child("Messages").push().key.toString()
+                                    FirebaseDatabase.getInstance().getReference("Chat").child(chat!!.id).child("Messages").child(message.id).setValue(message)
                                 }
                             }
                             else {
@@ -368,7 +402,8 @@ class individual_chat : AppCompatActivity() {
                                                 Log.w("TAG", "in mentor, getting url")
                                                 message.senderpic = user.profilepic.toString()
 
-                                                FirebaseDatabase.getInstance().getReference("Chat").child(chat!!.id).child("Messages").push().setValue(message)
+                                                message.id = FirebaseDatabase.getInstance().getReference("Chat").child(chat!!.id).child("Messages").push().key.toString()
+                                                FirebaseDatabase.getInstance().getReference("Chat").child(chat!!.id).child("Messages").child(message.id).setValue(message)
                                             }
                                         }
                                     }
@@ -421,7 +456,6 @@ class individual_chat : AppCompatActivity() {
         }
         mediaRecorder = null
     }
-
     private fun uploadAudio() {
         val storageRef = FirebaseStorage.getInstance().reference.child("Chats").child("voice").child(chat!!.id + Random.nextInt(0,100000).toString())
         val uploadTask = audioFile?.let { storageRef.putFile(Uri.fromFile(it)) }
@@ -431,13 +465,80 @@ class individual_chat : AppCompatActivity() {
                 val message = Messages().apply {
                     content = uri.toString()
                     senderid = mAuth.uid.toString()
-                    time = SimpleDateFormat("HH:mm").format(Date())
+                    time = Calendar.getInstance().time.toString()
                     tag = "audio"
+                    id = FirebaseDatabase.getInstance().getReference("Chat").child(chat!!.id).child("Messages").push().key.toString()
                 }
-                FirebaseDatabase.getInstance().getReference("Chat").child(chat!!.id).child("Messages").push().setValue(message)
+                FirebaseDatabase.getInstance().getReference("Chat").child(chat!!.id).child("Messages").child(message.id).setValue(message)
             }
         }?.addOnFailureListener {
             Log.e("TAG", "uploadAudio: ", it)
         }
     }
+
+    private fun showOptionsDialog(message: Messages) {
+        val options = arrayOf("Delete Message", "Edit Message")
+        val builder = AlertDialog.Builder(this)
+        builder.setTitle("Options")
+        builder.setItems(options) { dialogInterface: DialogInterface, which: Int ->
+            when (which) {
+                0 -> {
+                    val originalFormat = SimpleDateFormat("EEE MMM dd HH:mm:ss zzz yyyy", Locale.getDefault())
+                    val messageTime: Date = originalFormat.parse(message.time)!!
+                    val currentTime = Calendar.getInstance().time
+
+                    val diff = currentTime.time - messageTime.time
+
+                    if (diff < 300000) {
+                        val ref = FirebaseDatabase.getInstance().getReference("Chat").child(chat!!.id).child("Messages").child(message.id)
+                        ref.removeValue()
+                    } else {
+                        Toast.makeText(this, "You can only delete messages sent within the last 5 minutes", Toast.LENGTH_SHORT).show()
+                    }
+
+                }
+                1 -> {
+                    if (message.tag == "text"){
+                        val originalFormat = SimpleDateFormat("EEE MMM dd HH:mm:ss zzz yyyy", Locale.getDefault())
+                        val messageTime: Date = originalFormat.parse(message.time)!!
+                        val currentTime = Calendar.getInstance().time
+
+                        val diff = currentTime.time - messageTime.time
+
+                        if (diff < 300000) {
+                            var btsend: Button = findViewById(R.id.btsend)
+                            btsend.isEnabled = false
+
+                            val dialogView = LayoutInflater.from(this).inflate(R.layout.editmessage_layout, null)
+                            val builder = AlertDialog.Builder(this).setView(dialogView)
+                            val alertDialog = builder.show()
+
+                            val editText = dialogView.findViewById<EditText>(R.id.dialog_edit_text)
+                            editText.setText(message.content)
+
+                            dialogView.findViewById<Button>(R.id.dialog_cancel_button).setOnClickListener {
+                                alertDialog.dismiss()
+                            }
+
+                            dialogView.findViewById<Button>(R.id.dialog_done_button).setOnClickListener {
+                                message.content = editText.text.toString()
+                                FirebaseDatabase.getInstance().getReference("Chat").child(chat!!.id).child("Messages").child(message.id).setValue(message)
+                                btsend.isEnabled = true
+                                editText.setText("")
+                                alertDialog.dismiss()
+                            }
+                        }
+                        else{
+                            Toast.makeText(this, "You can only edit messages sent within the last 5 minutes", Toast.LENGTH_SHORT).show()
+                        }
+                    }
+                    else{
+                        Toast.makeText(this, "You can only edit text messages", Toast.LENGTH_SHORT).show()
+                    }
+                }
+            }
+        }
+        builder.create().show()
+    }
+
 }
