@@ -1,5 +1,6 @@
 package com.ShayaanNofil.i210450
 
+import Mentors
 import User
 import android.content.Intent
 import androidx.appcompat.app.AppCompatActivity
@@ -9,12 +10,18 @@ import android.view.View
 import android.widget.EditText
 import android.widget.Spinner
 import android.widget.Toast
+import com.google.android.gms.tasks.OnCompleteListener
 import com.google.firebase.Firebase
+import com.google.firebase.FirebaseApp
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.auth.auth
+import com.google.firebase.database.DataSnapshot
+import com.google.firebase.database.DatabaseError
 import com.google.firebase.database.DatabaseReference
 import com.google.firebase.database.FirebaseDatabase
+import com.google.firebase.database.ValueEventListener
 import com.google.firebase.database.database
+import com.google.firebase.messaging.FirebaseMessaging
 
 private lateinit var mAuth: FirebaseAuth
 private lateinit var database: DatabaseReference
@@ -63,9 +70,71 @@ class sign_up : AppCompatActivity() {
                     var usr: User = User()
                     var userId = mAuth.uid;
                     usr.addData(userId.toString(), name.text.toString(), email, number.text.toString(), city.text.toString(), country.selectedItem.toString())
-
+                    usr.id = mAuth.uid.toString()
 
                     database.child(userId!!).setValue(usr).addOnCompleteListener {
+
+                        FirebaseApp.initializeApp(this)
+                        FirebaseMessaging.getInstance().token.addOnCompleteListener(
+                            OnCompleteListener { task ->
+                            if (!task.isSuccessful) {
+                                Log.w("TAG", "Fetching FCM registration token failed", task.exception)
+                                return@OnCompleteListener
+                            }
+                            // Get new FCM registration token
+                            val token = task.result
+                            Log.d("MyToken", token)
+
+                            FirebaseDatabase.getInstance().getReference("User").child(mAuth.uid.toString()).addListenerForSingleValueEvent(object:
+                                ValueEventListener {
+                                override fun onDataChange(snapshot: DataSnapshot) {
+                                    if (snapshot.exists()) {
+                                        Log.w("TAG", "User is a user")
+                                        var usr : User = snapshot.getValue(User::class.java)!!
+                                        FirebaseMessaging.getInstance().token.addOnCompleteListener(OnCompleteListener { task ->
+                                            if (!task.isSuccessful) {
+                                                Log.w("TAG", "Fetching FCM registration token failed", task.exception)
+                                                return@OnCompleteListener
+                                            }
+                                            // Get new FCM registration token
+                                            val token = task.result
+                                            Log.d("MyToken", token)
+                                            usr.token = token
+                                            FirebaseDatabase.getInstance().getReference("User")
+                                                .child(Firebase.auth.uid.toString()).setValue(usr)
+                                        })
+
+                                    }
+                                    else{
+                                        Log.w("TAG", "User is a mentor")
+                                        FirebaseDatabase.getInstance().getReference("Mentor").child(mAuth.uid.toString()).addListenerForSingleValueEvent(object:
+                                            ValueEventListener {
+                                            override fun onDataChange(snapshot: DataSnapshot) {
+                                                if (snapshot.exists()) {
+                                                    var usr : Mentors = snapshot.getValue(Mentors::class.java)!!
+                                                    FirebaseMessaging.getInstance().token.addOnCompleteListener(OnCompleteListener { task ->
+                                                        if (!task.isSuccessful) {
+                                                            Log.w("TAG", "Fetching FCM registration token failed", task.exception)
+                                                            return@OnCompleteListener
+                                                        }
+                                                        // Get new FCM registration token
+                                                        val token = task.result
+                                                        Log.d("MyToken", token)
+                                                        usr.token = token
+                                                        FirebaseDatabase.getInstance().getReference("Mentor")
+                                                            .child(Firebase.auth.uid.toString()).setValue(usr)
+                                                    })
+                                                }
+                                            }
+                                            override fun onCancelled(error: DatabaseError) {}
+                                        })
+
+                                    }
+                                }
+                                override fun onCancelled(error: DatabaseError) {}
+                            })
+                        })
+
                         var secondActivityIntent = Intent(this, profile_page::class.java)
                         startActivity(secondActivityIntent)
                         finish()

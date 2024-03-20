@@ -58,10 +58,25 @@ import java.util.Calendar
 import java.util.Date
 import java.util.Locale
 import kotlin.random.Random
-
+import org.json.JSONObject
+import android.app.Notification
+import android.content.pm.PackageManager
+import android.widget.ImageView
+import com.google.android.gms.tasks.OnCompleteListener
+import com.google.firebase.FirebaseApp
+import com.google.firebase.database.getValue
+import com.google.firebase.messaging.FirebaseMessaging
+import okhttp3.OkHttpClient
+import okhttp3.Request
+import okhttp3.Callback
+import okhttp3.Call
+import okhttp3.Response
+import okhttp3.MediaType.Companion.toMediaType
+import okhttp3.RequestBody.Companion.toRequestBody
 
 private lateinit var mAuth: FirebaseAuth
 private lateinit var database: DatabaseReference
+private lateinit var username: String
 class individual_chat : AppCompatActivity() {
     private var messages: Messages? = null
     private var messageimg: Uri? = null
@@ -85,6 +100,8 @@ class individual_chat : AppCompatActivity() {
         //Screenshots
         val uri = MediaStore.Images.Media.EXTERNAL_CONTENT_URI
         contentResolver.registerContentObserver(uri, true, screenshotObserver)
+        askNotificationPermission()
+
 
         var chattername : TextView = findViewById(R.id.chatter_name)
         mAuth = Firebase.auth
@@ -94,8 +111,9 @@ class individual_chat : AppCompatActivity() {
             override fun onDataChange(snapshot: DataSnapshot) {
                 if (snapshot.exists()) {
                     Log.w("TAG", "User is a user")
-                    database = FirebaseDatabase.getInstance().getReference("Mentor")
+                    username = snapshot.getValue(User::class.java)!!.name
 
+                    database = FirebaseDatabase.getInstance().getReference("Mentor")
                     database.addListenerForSingleValueEvent(object: ValueEventListener {
                         override fun onDataChange(snapshot: DataSnapshot) {
                             if (snapshot.exists()) {
@@ -126,6 +144,14 @@ class individual_chat : AppCompatActivity() {
                 }
                 else{
                     Log.w("TAG", "User is a mentor")
+                        FirebaseDatabase.getInstance().getReference("Mentor").child(mAuth.uid.toString()).addListenerForSingleValueEvent(object: ValueEventListener {
+                            override fun onDataChange(snapshot: DataSnapshot) {
+                                if (snapshot.exists()) {
+                                    username = snapshot.getValue(Mentors::class.java)!!.name
+                                }
+                            }
+                            override fun onCancelled(error: DatabaseError) {}
+                        })
 
                         FirebaseDatabase.getInstance().getReference("User").addListenerForSingleValueEvent(object: ValueEventListener {
                         override fun onDataChange(snapshot: DataSnapshot) {
@@ -160,7 +186,6 @@ class individual_chat : AppCompatActivity() {
             override fun onCancelled(error: DatabaseError) {}
         })
 
-
         val recycle_topmentor: RecyclerView = findViewById(R.id.messages_recycler)
         val layoutManager = LinearLayoutManager(this, LinearLayoutManager.VERTICAL, false)
         layoutManager.stackFromEnd = true
@@ -187,17 +212,28 @@ class individual_chat : AppCompatActivity() {
                         chat_recycle_adapter.OnClickListener {
                         @SuppressLint("ServiceCast")
                         override fun onClick(position: Int, model: Messages) {
-                            val vibrator = getSystemService(Context.VIBRATOR_SERVICE) as Vibrator
-
-                            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
-                                // For newer APIs
-                                vibrator.vibrate(VibrationEffect.createOneShot(100, VibrationEffect.DEFAULT_AMPLITUDE))
-                            } else {
-                                // For older APIs
-                                vibrator.vibrate(100)
+                            if (model.senderid == Firebase.auth.uid && model.tag != "image"){
+                                val vibrator = getSystemService(VIBRATOR_SERVICE) as Vibrator
+                                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+                                    // For newer APIs
+                                    vibrator.vibrate(VibrationEffect.createOneShot(100, VibrationEffect.DEFAULT_AMPLITUDE))
+                                } else {
+                                    // For older APIs
+                                    vibrator.vibrate(100)
+                                }
+                                showOptionsDialog(model)
                             }
-
-                            showOptionsDialog(model)
+                            else if (model.tag == "image"){
+                                val vibrator = getSystemService(VIBRATOR_SERVICE) as Vibrator
+                                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+                                    // For newer APIs
+                                    vibrator.vibrate(VibrationEffect.createOneShot(100, VibrationEffect.DEFAULT_AMPLITUDE))
+                                } else {
+                                    // For older APIs
+                                    vibrator.vibrate(100)
+                                }
+                                showOptionsDialogimage(model)
+                            }
                         }
                     })
                 }
@@ -208,13 +244,13 @@ class individual_chat : AppCompatActivity() {
         })
 
 
-        val btsend: android.widget.Button = findViewById(R.id.btsend)
+        val btsend: Button = findViewById(R.id.btsend)
         btsend.setOnClickListener(View.OnClickListener {
             uploadmessage()
             screenshot = false
         })
 
-        val backbutton: android.widget.Button = findViewById(R.id.back_button)
+        val backbutton: Button = findViewById(R.id.back_button)
         backbutton.setOnClickListener(View.OnClickListener {
             finish()
         })
@@ -235,6 +271,7 @@ class individual_chat : AppCompatActivity() {
         //Camera picture
         val uppic=findViewById<View>(R.id.btcamera)
         uppic.setOnClickListener(View.OnClickListener {
+            screenshot = true
             val temp = Intent(this, camera_picture_mode::class.java )
             val bundle = Bundle()
             bundle.putSerializable("chatdata", chat)
@@ -342,6 +379,8 @@ class individual_chat : AppCompatActivity() {
 
                             message.id = FirebaseDatabase.getInstance().getReference("Chat").child(chat!!.id).child("Messages").push().key.toString()
                             FirebaseDatabase.getInstance().getReference("Chat").child(chat!!.id).child("Messages").child(message.id).setValue(message)
+
+                            sendNotiftoRecepients(chat!!, message)
                         }
                     }
                     else{
@@ -356,6 +395,7 @@ class individual_chat : AppCompatActivity() {
 
                                         message.id = FirebaseDatabase.getInstance().getReference("Chat").child(chat!!.id).child("Messages").push().key.toString()
                                         FirebaseDatabase.getInstance().getReference("Chat").child(chat!!.id).child("Messages").child(message.id).setValue(message)
+                                        sendNotiftoRecepients(chat!!, message)
                                     }
                                 }
                             }
@@ -391,6 +431,7 @@ class individual_chat : AppCompatActivity() {
 
                                     message.id = FirebaseDatabase.getInstance().getReference("Chat").child(chat!!.id).child("Messages").push().key.toString()
                                     FirebaseDatabase.getInstance().getReference("Chat").child(chat!!.id).child("Messages").child(message.id).setValue(message)
+                                    sendNotiftoRecepients(chat!!, message)
                                 }
                             }
                             else {
@@ -404,6 +445,7 @@ class individual_chat : AppCompatActivity() {
 
                                                 message.id = FirebaseDatabase.getInstance().getReference("Chat").child(chat!!.id).child("Messages").push().key.toString()
                                                 FirebaseDatabase.getInstance().getReference("Chat").child(chat!!.id).child("Messages").child(message.id).setValue(message)
+                                                sendNotiftoRecepients(chat!!, message)
                                             }
                                         }
                                     }
@@ -518,6 +560,7 @@ class individual_chat : AppCompatActivity() {
 
                             dialogView.findViewById<Button>(R.id.dialog_cancel_button).setOnClickListener {
                                 alertDialog.dismiss()
+                                btsend.isEnabled = true
                             }
 
                             dialogView.findViewById<Button>(R.id.dialog_done_button).setOnClickListener {
@@ -539,6 +582,179 @@ class individual_chat : AppCompatActivity() {
             }
         }
         builder.create().show()
+    }
+
+    private fun showOptionsDialogimage(message: Messages) {
+        val options = arrayOf("Delete Message", "View Message")
+        val builder = AlertDialog.Builder(this)
+        builder.setTitle("Options")
+        builder.setItems(options) { dialogInterface: DialogInterface, which: Int ->
+            when (which) {
+                0 -> {
+                    val originalFormat = SimpleDateFormat("EEE MMM dd HH:mm:ss zzz yyyy", Locale.getDefault())
+                    val messageTime: Date = originalFormat.parse(message.time)!!
+                    val currentTime = Calendar.getInstance().time
+
+                    val diff = currentTime.time - messageTime.time
+
+                    if (diff < 300000) {
+                        val ref = FirebaseDatabase.getInstance().getReference("Chat").child(chat!!.id).child("Messages").child(message.id)
+                        ref.removeValue()
+                    } else {
+                        Toast.makeText(this, "You can only delete messages sent within the last 5 minutes", Toast.LENGTH_SHORT).show()
+                    }
+
+                }
+                1 -> {
+                    val dialogView = LayoutInflater.from(this).inflate(R.layout.image_fullscreen_viewer, null)
+                    val builder = AlertDialog.Builder(this).setView(dialogView)
+                    val alertDialog = builder.show()
+
+                    val window = alertDialog.window
+
+                    window?.setLayout(WindowManager.LayoutParams.WRAP_CONTENT, WindowManager.LayoutParams.WRAP_CONTENT)
+
+                    val backbutton = dialogView.findViewById<Button>(R.id.back_button)
+                    backbutton.setOnClickListener(View.OnClickListener {
+                        alertDialog.dismiss()
+                    })
+
+                    val imageView = dialogView.findViewById<ImageView>(R.id.image_displayer)
+                    Glide.with(this)
+                        .load(message.content)
+                        .into(imageView)
+                }
+            }
+        }
+        builder.create().show()
+    }
+
+
+    var requestPermissionLauncher = registerForActivityResult(
+        ActivityResultContracts.RequestPermission(),)
+    { isGranted: Boolean ->
+        if (isGranted) {
+            // FCM SDK (and your app) can post notifications.
+        } else {
+            askNotificationPermission()
+        }
+    }
+    private fun askNotificationPermission() {
+        // This is only necessary for API level >= 33 (TIRAMISU)
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
+            if (ContextCompat.checkSelfPermission(
+                    this,
+                    android.Manifest.permission.POST_NOTIFICATIONS
+                ) ==
+                PackageManager.PERMISSION_GRANTED
+            ) {
+                // FCM SDK (and your app) can post notifications.
+            } else if (shouldShowRequestPermissionRationale(android.Manifest.permission.POST_NOTIFICATIONS)) {
+                // TODO: display an educational UI explaining to the user the features that will be enabled
+                //       by them granting the POST_NOTIFICATION permission. This UI should provide the user
+                //       "OK" and "No thanks" buttons. If the user selects "OK," directly request the permission.
+                //       If the user selects "No thanks," allow the user to continue without notifications.
+            } else {
+                // Directly ask for the permission
+                requestPermissionLauncher.launch(android.Manifest.permission.POST_NOTIFICATIONS)
+            }
+        }
+    }
+    fun sendPushNotification(token: String, title: String, subtitle: String, body: String, data: Map<String, String> = emptyMap()) {
+        val url = "https://fcm.googleapis.com/fcm/send"
+        val bodyJson = JSONObject()
+        bodyJson.put("to", token)
+        bodyJson.put("notification",
+            JSONObject().also {
+                it.put("title", title)
+                it.put("subtitle", subtitle)
+                it.put("body", body)
+                it.put("sound", "social_notification_sound.wav")
+            }
+        )
+        Log.d("TAG", "sendPushNotification: ${JSONObject(data)}")
+        if (data.isNotEmpty()) {
+            bodyJson.put("data", JSONObject(data))
+        }
+
+        var key="AAAAD3l6odE:APA91bFv-1TOpuvIoNLlqZxmR6v5-BfI4klzjVRUyak0fXtyIh7KBG76LokhbXDHOgGj8ufINA7kvc1VZGKI1EmGpPjI6N6z5QPPvm2u1K95bBNH37IgR6aHEF0qpSGhe6KxOD_zOEAD"
+        val request = Request.Builder()
+            .url(url)
+            .addHeader("Content-Type", "application/json")
+            .addHeader("Authorization", "key=$key")
+            .post(
+                bodyJson.toString().toRequestBody("application/json; charset=utf-8".toMediaType())
+            )
+            .build()
+
+        val client = OkHttpClient()
+
+        client.newCall(request).enqueue(
+            object : Callback {
+                override fun onResponse(call: Call, response: Response) {
+                    println("Received data: ${response.body?.string()}")
+                    Log.d("TAG", "onResponse: ${response}   ")
+                    Log.d("TAG", "onResponse Message: ${response.message}   ")
+                }
+
+                override fun onFailure(call: Call, e: IOException) {
+                    println(e.message.toString())
+                    Log.d("TAG", "onFailure: ${e.message.toString()}")
+                }
+            }
+        )
+    }
+    fun sendNotiftoRecepients(chats: Chats, message: Messages){
+        FirebaseDatabase.getInstance().getReference("User").addListenerForSingleValueEvent(object: ValueEventListener {
+            override fun onDataChange(snapshot: DataSnapshot) {
+                if (snapshot.exists()) {
+                    for (data in snapshot.children) {
+                        var usr : User = data.getValue(User::class.java)!!
+                        FirebaseDatabase.getInstance().getReference("User").child(usr.id).child("Chats").addListenerForSingleValueEvent(object : ValueEventListener {
+                            override fun onDataChange(snapshot: DataSnapshot) {
+                                if (snapshot.exists()) {
+                                    for (data in snapshot.children) {
+                                        val chats = data.getValue(String::class.java)
+                                        if (chats != null) {
+                                            if (chats == chat!!.id) {
+                                                sendPushNotification(usr.token, "New Message " + username, "New Message from ", message.content, mapOf("chatid" to chat!!.id))
+                                            }
+                                        }
+                                    }
+                                }
+                            }
+                            override fun onCancelled(error: DatabaseError) {}
+                        })
+                    }
+                }
+            }
+            override fun onCancelled(error: DatabaseError) {}
+        })
+        FirebaseDatabase.getInstance().getReference("Mentor").addListenerForSingleValueEvent(object: ValueEventListener {
+            override fun onDataChange(snapshot: DataSnapshot) {
+                if (snapshot.exists()) {
+                    for (data in snapshot.children) {
+                        var usr : Mentors = data.getValue(Mentors::class.java)!!
+                        FirebaseDatabase.getInstance().getReference("Mentor").child(usr.id).child("Chats").addListenerForSingleValueEvent(object : ValueEventListener {
+                            override fun onDataChange(snapshot: DataSnapshot) {
+                                if (snapshot.exists()) {
+                                    for (data in snapshot.children) {
+                                        val chats = data.getValue(String::class.java)
+                                        if (chats != null) {
+                                            if (chats == chat!!.id) {
+                                                sendPushNotification(usr.token, "New Message " + username, "New Message from " + username, message.content, mapOf("chatid" to chat!!.id))
+                                            }
+                                        }
+                                    }
+                                }
+                            }
+                            override fun onCancelled(error: DatabaseError) {}
+                        })
+                    }
+                }
+            }
+            override fun onCancelled(error: DatabaseError) {}
+        })
     }
 
 }

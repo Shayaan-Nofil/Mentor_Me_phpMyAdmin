@@ -11,6 +11,7 @@ class Mentors: Serializable {
     var profilepic: String = ""
     var rate: Int = 0
     var status: String = ""
+    var token: String = ""
 
     fun addData (ID:String = "", nam:String = "", jb: String = "" , descp: String = "", pic: String = "" , ratg: Double = 0.0, rt: Int = 0){
         name = nam
