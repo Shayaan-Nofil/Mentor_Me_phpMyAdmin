@@ -11,6 +11,7 @@ import android.os.Bundle
 import android.util.Log
 import android.view.View
 import android.widget.Button
+import android.widget.ImageButton
 import android.widget.ImageView
 import android.widget.TextView
 import androidx.activity.result.contract.ActivityResultContracts
@@ -142,7 +143,7 @@ class profile_page : AppCompatActivity() {
             openGalleryForImage2()
         })
 
-        val editprofile : Button = findViewById(R.id.bt_settings)
+        val editprofile : ImageButton = findViewById(R.id.bt_settings)
         editprofile.setOnClickListener(View.OnClickListener {
             showOptionsDialog()
         })

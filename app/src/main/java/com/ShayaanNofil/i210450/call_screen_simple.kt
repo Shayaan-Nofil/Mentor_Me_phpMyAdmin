@@ -10,8 +10,6 @@ import android.view.View.VISIBLE
 import android.widget.Toast
 import androidx.core.app.ActivityCompat
 import androidx.core.content.ContextCompat
-import com.ShayaanNofil.i210450.databinding.ActivityCallScreenSimpleBinding
-import com.ShayaanNofil.i210450.databinding.ActivityMainSplashScreenBinding
 import io.agora.rtc2.ChannelMediaOptions
 import io.agora.rtc2.Constants
 import io.agora.rtc2.IRtcEngineEventHandler
@@ -20,7 +18,7 @@ import io.agora.rtc2.RtcEngineConfig
 import io.agora.rtc2.video.VideoCanvas
 
 class call_screen_simple : AppCompatActivity() {
-    private lateinit var binding : ActivityCallScreenSimpleBinding
+   // private lateinit var binding : ActivityCallScreenSimpleBinding
 
     private val appID = "def8448e122f467e86b87e4491d50c64"
     private  val channelName = "Video call Mentorme"
@@ -153,7 +151,7 @@ class call_screen_simple : AppCompatActivity() {
     private fun setupRemoteVideo(uid : Int){
         remoteSurfaceView = SurfaceView(baseContext)
         remoteSurfaceView!!.setZOrderMediaOverlay(true)
-        binding.remoteUser.addView(remoteSurfaceView)
+        //binding.remoteUser.addView(remoteSurfaceView)
 
         agoraEngine!!.setupRemoteVideo(
             VideoCanvas(
@@ -166,7 +164,7 @@ class call_screen_simple : AppCompatActivity() {
 
     private fun setupLocalVideo(){
         localSurfaceView = SurfaceView(baseContext)
-        binding.remoteUser.addView(localSurfaceView)
+        //binding.remoteUser.addView(localSurfaceView)
 
         agoraEngine!!.setupLocalVideo(
             VideoCanvas(

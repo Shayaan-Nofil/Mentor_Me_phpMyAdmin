@@ -258,8 +258,11 @@ class individual_chat : AppCompatActivity() {
         val voicebutton=findViewById<View>(R.id.voicecall_button)
         voicebutton.setOnClickListener(View.OnClickListener {
             val temp = Intent(this, voice_call::class.java )
+            val bundle = Bundle()
+            bundle.putSerializable("chatdata", chat)
+            bundle.putString("recieverid", chat!!.id)
+            temp.putExtras(bundle)
             startActivity(temp)
-            finish()
         })
 
         val videobutton=findViewById<View>(R.id.videocall_button)
@@ -591,19 +594,23 @@ class individual_chat : AppCompatActivity() {
         builder.setItems(options) { dialogInterface: DialogInterface, which: Int ->
             when (which) {
                 0 -> {
-                    val originalFormat = SimpleDateFormat("EEE MMM dd HH:mm:ss zzz yyyy", Locale.getDefault())
-                    val messageTime: Date = originalFormat.parse(message.time)!!
-                    val currentTime = Calendar.getInstance().time
+                    if (mAuth.uid.toString() == message.senderid){
+                        val originalFormat = SimpleDateFormat("EEE MMM dd HH:mm:ss zzz yyyy", Locale.getDefault())
+                        val messageTime: Date = originalFormat.parse(message.time)!!
+                        val currentTime = Calendar.getInstance().time
 
-                    val diff = currentTime.time - messageTime.time
+                        val diff = currentTime.time - messageTime.time
 
-                    if (diff < 300000) {
-                        val ref = FirebaseDatabase.getInstance().getReference("Chat").child(chat!!.id).child("Messages").child(message.id)
-                        ref.removeValue()
-                    } else {
-                        Toast.makeText(this, "You can only delete messages sent within the last 5 minutes", Toast.LENGTH_SHORT).show()
+                        if (diff < 300000) {
+                            val ref = FirebaseDatabase.getInstance().getReference("Chat").child(chat!!.id).child("Messages").child(message.id)
+                            ref.removeValue()
+                        } else {
+                            Toast.makeText(this, "You can only delete messages sent within the last 5 minutes", Toast.LENGTH_SHORT).show()
+                        }
                     }
-
+                    else{
+                        Toast.makeText(this, "You can only delete your own messages", Toast.LENGTH_SHORT).show()
+                    }
                 }
                 1 -> {
                     val dialogView = LayoutInflater.from(this).inflate(R.layout.image_fullscreen_viewer, null)

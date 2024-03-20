@@ -31,7 +31,7 @@
             android:layout_marginTop="10dp"
             android:layout_below="@id/callerID"/>
 
-        <ImageView
+        <de.hdodenhof.circleimageview.CircleImageView
             android:id="@+id/johncircle"
             android:src="@drawable/john_circle"
             android:layout_width="120dp"

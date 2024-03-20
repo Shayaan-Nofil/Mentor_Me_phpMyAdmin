@@ -5,6 +5,9 @@
       <entry key="app">
         <State />
       </entry>
+      <entry key="book_session_test">
+        <State />
+      </entry>
     </value>
   </component>
 </project>

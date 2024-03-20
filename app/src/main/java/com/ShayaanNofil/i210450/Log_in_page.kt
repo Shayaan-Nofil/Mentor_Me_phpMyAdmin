@@ -31,6 +31,80 @@ class Log_in_page : AppCompatActivity() {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_log_in)
 
+        mAuth = Firebase.auth
+        // Check if user is already logged in
+        val currentUser = FirebaseAuth.getInstance().currentUser
+        if (currentUser != null) {
+            FirebaseApp.initializeApp(this)
+            FirebaseMessaging.getInstance().token.addOnCompleteListener(OnCompleteListener { task ->
+                if (!task.isSuccessful) {
+                    Log.w("TAG", "Fetching FCM registration token failed", task.exception)
+                    return@OnCompleteListener
+                }
+                // Get new FCM registration token
+                val token = task.result
+                Log.d("MyToken", token)
+
+                FirebaseDatabase.getInstance().getReference("User").child(mAuth.uid.toString()).addListenerForSingleValueEvent(object:
+                    ValueEventListener {
+                    override fun onDataChange(snapshot: DataSnapshot) {
+                        if (snapshot.exists()) {
+                            Log.w("TAG", "User is a user")
+                            var usr : User = snapshot.getValue(User::class.java)!!
+                            FirebaseMessaging.getInstance().token.addOnCompleteListener(OnCompleteListener { task ->
+                                if (!task.isSuccessful) {
+                                    Log.w("TAG", "Fetching FCM registration token failed", task.exception)
+                                    return@OnCompleteListener
+                                }
+                                // Get new FCM registration token
+                                val token = task.result
+                                Log.d("MyToken", token)
+                                usr.token = token
+                                FirebaseDatabase.getInstance().getReference("User")
+                                    .child(Firebase.auth.uid.toString())
+                                    .child("token")
+                                    .setValue(token)
+                            })
+
+                        }
+                        else{
+                            Log.w("TAG", "User is a mentor")
+                            FirebaseDatabase.getInstance().getReference("Mentor").child(mAuth.uid.toString()).addListenerForSingleValueEvent(object:
+                                ValueEventListener {
+                                override fun onDataChange(snapshot: DataSnapshot) {
+                                    if (snapshot.exists()) {
+                                        var usr : Mentors = snapshot.getValue(Mentors::class.java)!!
+                                        FirebaseMessaging.getInstance().token.addOnCompleteListener(OnCompleteListener { task ->
+                                            if (!task.isSuccessful) {
+                                                Log.w("TAG", "Fetching FCM registration token failed", task.exception)
+                                                return@OnCompleteListener
+                                            }
+                                            // Get new FCM registration token
+                                            val token = task.result
+                                            Log.d("MyToken", token)
+                                            usr.token = token
+                                            FirebaseDatabase.getInstance().getReference("Mentor")
+                                                .child(Firebase.auth.uid.toString())
+                                                .child("token")
+                                                .setValue(token)
+                                        })
+                                    }
+                                }
+                                override fun onCancelled(error: DatabaseError) {}
+                            })
+
+                        }
+                    }
+                    override fun onCancelled(error: DatabaseError) {}
+                })
+            })
+            // User is already logged in, navigate to home page
+            val secondActivityIntent = Intent(this, home_page::class.java)
+            startActivity(secondActivityIntent)
+            finish()
+            return
+        }
+
 
         val loginbutton=findViewById<View>(R.id.login_button)
         loginbutton.setOnClickListener(View.OnClickListener {

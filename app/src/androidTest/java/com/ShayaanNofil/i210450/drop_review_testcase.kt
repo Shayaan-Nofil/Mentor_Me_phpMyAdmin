@@ -3,9 +3,13 @@ package com.ShayaanNofil.i210450
 
 import android.view.View
 import android.view.ViewGroup
+import androidx.recyclerview.widget.RecyclerView.ViewHolder
+import androidx.test.espresso.Espresso.onData
 import androidx.test.espresso.Espresso.onView
+import androidx.test.espresso.Espresso.pressBack
 import androidx.test.espresso.action.ViewActions.*
 import androidx.test.espresso.assertion.ViewAssertions.*
+import androidx.test.espresso.contrib.RecyclerViewActions.actionOnItemAtPosition
 import androidx.test.espresso.matcher.ViewMatchers.*
 import androidx.test.ext.junit.rules.ActivityScenarioRule
 import androidx.test.ext.junit.runners.AndroidJUnit4
@@ -13,6 +17,7 @@ import androidx.test.filters.LargeTest
 import org.hamcrest.Description
 import org.hamcrest.Matcher
 import org.hamcrest.Matchers.allOf
+import org.hamcrest.Matchers.anything
 import org.hamcrest.Matchers.`is`
 import org.hamcrest.TypeSafeMatcher
 import org.junit.Rule
@@ -21,14 +26,52 @@ import org.junit.runner.RunWith
 
 @LargeTest
 @RunWith(AndroidJUnit4::class)
-class General_traversal_2 {
+class drop_review_testcase {
 
     @Rule
     @JvmField
-    var mActivityScenarioRule = ActivityScenarioRule(Log_in_page::class.java)
+    var mActivityScenarioRule = ActivityScenarioRule(main_splash_screen::class.java)
 
     @Test
-    fun general_traversal_2() {
+    fun drop_review_testcase() {
+        val appCompatEditText = onView(
+            allOf(
+                withId(R.id.email_box),
+                childAtPosition(
+                    allOf(
+                        withId(R.id.rel_layout),
+                        childAtPosition(
+                            withClassName(`is`("android.widget.LinearLayout")),
+                            1
+                        )
+                    ),
+                    2
+                ),
+                isDisplayed()
+            )
+        )
+        appCompatEditText.perform(replaceText("t@gmail.com"), closeSoftKeyboard())
+
+        val appCompatEditText2 = onView(
+            allOf(
+                withId(R.id.password_box),
+                childAtPosition(
+                    allOf(
+                        withId(R.id.rel_layout),
+                        childAtPosition(
+                            withClassName(`is`("android.widget.LinearLayout")),
+                            1
+                        )
+                    ),
+                    4
+                ),
+                isDisplayed()
+            )
+        )
+        appCompatEditText2.perform(replaceText("123456"), closeSoftKeyboard())
+
+        pressBack()
+
         val appCompatButton = onView(
             allOf(
                 withId(R.id.login_button), withText("Login"),
@@ -47,7 +90,82 @@ class General_traversal_2 {
         )
         appCompatButton.perform(click())
 
+        val recyclerView = onView(
+            allOf(
+                withId(R.id.recycle_education),
+                childAtPosition(
+                    withClassName(`is`("android.widget.LinearLayout")),
+                    0
+                )
+            )
+        )
+        recyclerView.perform(actionOnItemAtPosition<ViewHolder>(0, click()))
+
         val appCompatButton2 = onView(
+            allOf(
+                withId(R.id.bt_drop_rev),
+                childAtPosition(
+                    childAtPosition(
+                        withClassName(`is`("android.widget.RelativeLayout")),
+                        1
+                    ),
+                    0
+                ),
+                isDisplayed()
+            )
+        )
+        appCompatButton2.perform(click())
+
+        val appCompatButton3 = onView(
+            allOf(
+                withId(R.id.fivestar),
+                childAtPosition(
+                    childAtPosition(
+                        withClassName(`is`("android.widget.RelativeLayout")),
+                        1
+                    ),
+                    4
+                ),
+                isDisplayed()
+            )
+        )
+        appCompatButton3.perform(click())
+
+        val appCompatEditText3 = onView(
+            allOf(
+                withId(R.id.review_para),
+                childAtPosition(
+                    childAtPosition(
+                        withClassName(`is`("android.widget.LinearLayout")),
+                        1
+                    ),
+                    0
+                ),
+                isDisplayed()
+            )
+        )
+        appCompatEditText3.perform(replaceText("great experience "), closeSoftKeyboard())
+
+        pressBack()
+
+        val appCompatButton4 = onView(
+            allOf(
+                withId(R.id.submit_button), withText("Submit Feedback"),
+                childAtPosition(
+                    childAtPosition(
+                        withClassName(`is`("android.widget.LinearLayout")),
+                        1
+                    ),
+                    2
+                ),
+                isDisplayed()
+            )
+        )
+        appCompatButton4.perform(click())
+
+        pressBack()
+
+        val appCompatButton5 = onView(
             allOf(
                 withId(R.id.btprofile),
                 childAtPosition(
@@ -63,180 +181,35 @@ class General_traversal_2 {
                 isDisplayed()
             )
         )
-        appCompatButton2.perform(click())
-
-        val appCompatButton3 = onView(
-            allOf(
-                withId(R.id.sessions_button), withText("Booked Sessions"),
-                childAtPosition(
-                    childAtPosition(
-                        withClassName(`is`("android.widget.LinearLayout")),
-                        1
-                    ),
-                    6
-                ),
-                isDisplayed()
-            )
-        )
-        appCompatButton3.perform(click())
-
-        val appCompatButton4 = onView(
-            allOf(
-                withId(R.id.back_button),
-                childAtPosition(
-                    childAtPosition(
-                        withClassName(`is`("androidx.constraintlayout.widget.ConstraintLayout")),
-                        0
-                    ),
-                    0
-                ),
-                isDisplayed()
-            )
-        )
-        appCompatButton4.perform(click())
-
-        val appCompatButton5 = onView(
-            allOf(
-                withId(R.id.sessions_button), withText("Booked Sessions"),
-                childAtPosition(
-                    childAtPosition(
-                        withClassName(`is`("android.widget.LinearLayout")),
-                        1
-                    ),
-                    6
-                ),
-                isDisplayed()
-            )
-        )
         appCompatButton5.perform(click())
 
         val appCompatButton6 = onView(
             allOf(
-                withId(R.id.back_button),
+                withId(R.id.bt_settings),
                 childAtPosition(
                     childAtPosition(
-                        withClassName(`is`("androidx.constraintlayout.widget.ConstraintLayout")),
+                        withClassName(`is`("android.widget.LinearLayout")),
                         0
                     ),
-                    0
+                    2
                 ),
                 isDisplayed()
             )
         )
         appCompatButton6.perform(click())
 
-        val circleImageView = onView(
-            allOf(
-                withId(R.id.edit_profile_button),
-                childAtPosition(
+        val appCompatTextView = onData(anything())
+            .inAdapterView(
+                allOf(
+                    withId(androidx.appcompat.R.id.select_dialog_listview),
                     childAtPosition(
-                        withClassName(`is`("android.widget.LinearLayout")),
-                        1
-                    ),
-                    3
-                ),
-                isDisplayed()
-            )
-        )
-        circleImageView.perform(click())
-
-        val appCompatButton7 = onView(
-            allOf(
-                withId(R.id.back_button),
-                childAtPosition(
-                    allOf(
-                        withId(R.id.parrel),
-                        childAtPosition(
-                            withClassName(`is`("android.widget.LinearLayout")),
-                            0
-                        )
-                    ),
-                    0
-                ),
-                isDisplayed()
-            )
-        )
-        appCompatButton7.perform(click())
-
-        val appCompatButton8 = onView(
-            allOf(
-                withId(R.id.btchat),
-                childAtPosition(
-                    allOf(
-                        withId(R.id.taskbar),
-                        childAtPosition(
-                            withClassName(`is`("android.widget.RelativeLayout")),
-                            1
-                        )
-                    ),
-                    2
-                ),
-                isDisplayed()
-            )
-        )
-        appCompatButton8.perform(click())
-
-        val linearLayout = onView(
-            allOf(
-                withId(R.id.john_message_chat),
-                childAtPosition(
-                    childAtPosition(
-                        withClassName(`is`("android.widget.ScrollView")),
+                        withId(androidx.appcompat.R.id.contentPanel),
                         0
-                    ),
-                    1
+                    )
                 )
             )
-        )
-        linearLayout.perform(scrollTo(), click())
-
-        val appCompatButton9 = onView(
-            allOf(
-                withId(R.id.voicecall_button),
-                childAtPosition(
-                    childAtPosition(
-                        withClassName(`is`("android.widget.LinearLayout")),
-                        0
-                    ),
-                    2
-                ),
-                isDisplayed()
-            )
-        )
-        appCompatButton9.perform(click())
-
-        val appCompatButton10 = onView(
-            allOf(
-                withId(R.id.end_button),
-                childAtPosition(
-                    allOf(
-                        withId(R.id.button_layout),
-                        childAtPosition(
-                            withClassName(`is`("android.widget.RelativeLayout")),
-                            3
-                        )
-                    ),
-                    1
-                ),
-                isDisplayed()
-            )
-        )
-        appCompatButton10.perform(click())
-
-        val appCompatButton11 = onView(
-            allOf(
-                withId(R.id.back_button),
-                childAtPosition(
-                    childAtPosition(
-                        withClassName(`is`("android.widget.LinearLayout")),
-                        0
-                    ),
-                    0
-                ),
-                isDisplayed()
-            )
-        )
-        appCompatButton11.perform(click())
+            .atPosition(1)
+        appCompatTextView.perform(click())
     }
 
     private fun childAtPosition(

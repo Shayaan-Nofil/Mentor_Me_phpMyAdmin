@@ -54,6 +54,7 @@ dependencies {
     implementation("com.google.firebase:firebase-inappmessaging-display:20.4.0")
     implementation("androidx.camera:camera-view:1.3.2")
     implementation("com.google.firebase:firebase-messaging:23.4.1")
+    androidTestImplementation("androidx.test.espresso:espresso-contrib:3.6.0-alpha03")
     annotationProcessor ("com.github.bumptech.glide:compiler:4.8.0")
     implementation ("com.firebaseui:firebase-ui-storage:7.2.0")
     implementation("com.google.firebase:firebase-analytics")
@@ -73,6 +74,6 @@ dependencies {
     implementation("com.google.firebase:firebase-database-ktx:20.3.1")
     implementation("com.google.firebase:firebase-storage-ktx:20.3.0")
     testImplementation("junit:junit:4.13.2")
-    androidTestImplementation("androidx.test.ext:junit:1.1.5")
-    androidTestImplementation("androidx.test.espresso:espresso-core:3.5.1")
+    androidTestImplementation("androidx.test.ext:junit:1.2.0-alpha03")
+    androidTestImplementation("androidx.test.espresso:espresso-core:3.6.0-alpha03")
 }
