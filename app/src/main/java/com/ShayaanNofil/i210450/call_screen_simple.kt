@@ -10,57 +10,42 @@ import android.view.View.VISIBLE
 import android.widget.Toast
 import androidx.core.app.ActivityCompat
 import androidx.core.content.ContextCompat
-import io.agora.rtc2.ChannelMediaOptions
-import io.agora.rtc2.Constants
 import io.agora.rtc2.IRtcEngineEventHandler
-import io.agora.rtc2.RtcEngine
-import io.agora.rtc2.RtcEngineConfig
 import io.agora.rtc2.video.VideoCanvas
+import android.Manifest
+import android.widget.FrameLayout
+import io.agora.rtc2.RtcEngine
 
 class call_screen_simple : AppCompatActivity() {
-   // private lateinit var binding : ActivityCallScreenSimpleBinding
 
-    private val appID = "def8448e122f467e86b87e4491d50c64"
-    private  val channelName = "Video call Mentorme"
-    private val token = "007eJxTYHjnb5Lv4h/+78iKH1ovM8P6syZ83/797yI2cXuzP4vztz1TYEhJTbMwMbFINTQySjMxM0+1MEuyME81MbE0TDE1SDYzmSn/PbUhkJFBdnMbCyMDBIL4wgxhmSmp+QrJiTk5Cr6peSX5RbmpDAwALP8nBA=="
-    private val uid = 0
-    private var isJoined = false
-    private var agoraEngine : RtcEngine? = null
-    private var localSurfaceView : SurfaceView? = null
-    private var remoteSurfaceView : SurfaceView? = null
+    private val APP_ID = "def8448e122f467e86b87e4491d50c64"
+    // Fill the channel name.
+    private val CHANNEL = "SMD_A2"
+    // Fill the temp token generated on Agora Console.
+    private val TOKEN = "007eJxTYHi84sOKkEa3yvZdyqxXJQ0Y42fru9Va5r9pbd0ve7yM7bICQ0pqmoWJiUWqoZFRmomZeaqFWZKFeaqJiaVhiqlBspmJkvH/1IZARoaHpveYGRkgEMRnYwj2dYl3NGJgAABDQh6J"
 
+    private var mRtcEngine: RtcEngine?= null
 
-    private val permission_id = 22
-    private val requestedpermession = arrayOf(
-        android.Manifest.permission.RECORD_AUDIO,
-        android.Manifest.permission.CAMERA)
-
-
-    private fun checkSelfPermission() : Boolean{
-        return !(ContextCompat.checkSelfPermission(this, requestedpermession[0]) != PackageManager.PERMISSION_GRANTED || ContextCompat.checkSelfPermission(
-            this, requestedpermession[1]
-        ) != PackageManager.PERMISSION_GRANTED)
-    }
-
-    private fun showMessage(message : String){
-        runOnUiThread{
-            Toast.makeText(this, message, Toast.LENGTH_SHORT).show()
+    private val mRtcEventHandler = object : IRtcEngineEventHandler() {
+        // Listen for the remote user joining the channel to get the uid of the user.
+        override fun onUserJoined(uid: Int, elapsed: Int) {
+            runOnUiThread {
+                // Call setupRemoteVideo to set the remote video view after getting uid from the onUserJoined callback.
+                setupRemoteVideo(uid)
+            }
         }
     }
 
-    protected open fun setupAgoraEngine(): Boolean {
-        try {
-            // Set the engine configuration
-            val config = RtcEngineConfig()
-            config.mContext = baseContext
-            config.mAppId = appID
+    // Kotlin
+    private val PERMISSION_REQ_ID_RECORD_AUDIO = 22
+    private val PERMISSION_REQ_ID_CAMERA = PERMISSION_REQ_ID_RECORD_AUDIO + 1
 
-            config.mEventHandler = mRtcEventHandler
-            agoraEngine = RtcEngine.create(config)
-
-            agoraEngine!!.enableVideo()
-        } catch (e: Exception) {
-            showMessage(e.toString())
+    private fun checkSelfPermission(permission: String, requestCode: Int): Boolean {
+        if (ContextCompat.checkSelfPermission(this, permission) !=
+            PackageManager.PERMISSION_GRANTED) {
+            ActivityCompat.requestPermissions(this,
+                arrayOf(permission),
+                requestCode)
             return false
         }
         return true
@@ -70,108 +55,51 @@ class call_screen_simple : AppCompatActivity() {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_call_screen_simple)
 
-        if (!checkSelfPermission()){
-            ActivityCompat.requestPermissions(
-                this, requestedpermession, permission_id
-            )
+        if (checkSelfPermission(Manifest.permission.RECORD_AUDIO, PERMISSION_REQ_ID_RECORD_AUDIO) && checkSelfPermission(Manifest.permission.CAMERA, PERMISSION_REQ_ID_CAMERA)) {
+            initializeAndJoinChannel()
         }
-        setupAgoraEngine()
-
-        if (checkSelfPermission()){
-            val option = ChannelMediaOptions()
-            option.channelProfile = Constants.CHANNEL_PROFILE_COMMUNICATION
-            option.clientRoleType = Constants.CLIENT_ROLE_BROADCASTER
-            setupLocalVideo()
-            localSurfaceView!!.visibility = VISIBLE
-            agoraEngine!!.startPreview()
-            agoraEngine!!.joinChannel(token, channelName, uid, option)
-        }
-        else{
-            Toast.makeText(this, "Permission not granted", Toast.LENGTH_SHORT).show()
-        }
-
 
         val backbutton=findViewById<View>(R.id.end_button)
         backbutton.setOnClickListener(View.OnClickListener {
-            leavecall()
             finish()
         })
     }
 
     override fun onDestroy() {
         super.onDestroy()
-        agoraEngine!!.stopPreview()
-        agoraEngine!!.leaveChannel()
 
-        Thread{
-            RtcEngine.destroy()
-            agoraEngine = null
-        }.start()
+        mRtcEngine?.leaveChannel()
+        RtcEngine.destroy()
     }
 
-    private fun leavecall() {
-        if (!isJoined){
-            showMessage("Please join a channel first")
-        }
-        else{
-            agoraEngine!!.leaveChannel()
-            showMessage("You left the channel")
-            if (remoteSurfaceView != null){
-                remoteSurfaceView!!.visibility = GONE
-            }
-            if (localSurfaceView != null){
-                localSurfaceView!!.visibility = GONE
-            }
-        }
-    }
+    private fun initializeAndJoinChannel() {
+        try {
+            mRtcEngine = RtcEngine.create(baseContext, APP_ID, mRtcEventHandler)
+        } catch (e: Exception) {
 
-    private val mRtcEventHandler : IRtcEngineEventHandler =
-        object : IRtcEngineEventHandler(){
-            override fun onUserJoined(uid: Int, elapsed: Int) {
-                //super.onUserJoined(uid, elapsed)
-                showMessage("Remote User joined $uid")
-                runOnUiThread { (setupRemoteVideo(uid)) }
-            }
-
-            override fun onJoinChannelSuccess(channel: String?, uid: Int, elapsed: Int) {
-                //super.onJoinChannelSuccess(channel, uid, elapsed)
-                isJoined = true
-                showMessage("Joined Channel $channel")
-            }
-
-            override fun onUserOffline(uid: Int, reason: Int) {
-                //super.onUserOffline(uid, reason)
-                showMessage("User offline")
-                runOnUiThread{
-                    remoteSurfaceView!!.visibility = GONE
-                }
-            }
         }
 
-    private fun setupRemoteVideo(uid : Int){
-        remoteSurfaceView = SurfaceView(baseContext)
-        remoteSurfaceView!!.setZOrderMediaOverlay(true)
-        //binding.remoteUser.addView(remoteSurfaceView)
+        // By default, video is disabled, and you need to call enableVideo to start a video stream.
+        mRtcEngine!!.enableVideo()
 
-        agoraEngine!!.setupRemoteVideo(
-            VideoCanvas(
-                remoteSurfaceView,
-                VideoCanvas.RENDER_MODE_FIT,
-                uid
-            )
-        )
+        val localContainer = findViewById<FrameLayout>(R.id.local_video_view_container)
+        // Call CreateRendererView to create a SurfaceView object and add it as a child to the FrameLayout.
+        val localFrame = RtcEngine.CreateRendererView(baseContext)
+        localContainer.addView(localFrame)
+        // Pass the SurfaceView object to Agora so that it renders the local video.
+        mRtcEngine!!.setupLocalVideo(VideoCanvas(localFrame, VideoCanvas.RENDER_MODE_FIT, 0))
+
+        // Join the channel with a token.
+        mRtcEngine!!.joinChannel(TOKEN, CHANNEL, "", 0)
     }
 
-    private fun setupLocalVideo(){
-        localSurfaceView = SurfaceView(baseContext)
-        //binding.remoteUser.addView(localSurfaceView)
+    private fun setupRemoteVideo(uid: Int) {
+        val remoteContainer = findViewById<FrameLayout>(R.id.remote_video_view_container)
 
-        agoraEngine!!.setupLocalVideo(
-            VideoCanvas(
-                localSurfaceView,
-                VideoCanvas.RENDER_MODE_FIT,
-                0
-            )
-        )
+        val remoteFrame = RtcEngine.CreateRendererView(baseContext)
+        remoteFrame.setZOrderMediaOverlay(true)
+        remoteContainer.addView(remoteFrame)
+        mRtcEngine!!.setupRemoteVideo(VideoCanvas(remoteFrame, VideoCanvas.RENDER_MODE_FIT, uid))
     }
+
 }

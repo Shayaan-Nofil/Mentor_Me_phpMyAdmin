@@ -9,7 +9,7 @@
         android:background="#cbcbcb">
 
         <FrameLayout
-            android:id="@+id/remote_user"
+            android:id="@+id/remote_video_view_container"
             android:layout_width="match_parent"
             android:layout_height="match_parent"
             android:orientation="vertical"
@@ -28,7 +28,7 @@
 
 
         <FrameLayout
-            android:id="@+id/local_user"
+            android:id="@+id/local_video_view_container"
             android:layout_width="100dp"
             android:layout_height="160dp"
             android:background="@drawable/white_rounded_rectangle"

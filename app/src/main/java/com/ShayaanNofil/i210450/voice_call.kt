@@ -16,6 +16,12 @@ import io.agora.rtc2.ChannelMediaOptions
 import io.agora.rtc2.Constants
 import io.agora.rtc2.RtcEngineConfig
 import io.agora.rtc2.video.VideoCanvas
+import android.content.pm.PackageManager
+import androidx.core.app.ActivityCompat
+import androidx.core.content.ContextCompat
+import android.Manifest
+import java.lang.Exception
+
 
 private lateinit var chat: Chats
 private lateinit var recieverid: String
@@ -27,11 +33,30 @@ private var callStartedTimeMillis = 0L
 
 
 class voice_call : AppCompatActivity() {
-    private val appID = "def8448e122f467e86b87e4491d50c64"
-    private val token = "007eJxTYFgc4/xE/0fo0ffX63cdPJlmedmOqWz2hLWMh77r1x/5YHhKgSElNc3CxMQi1dDIKM3EzDzVwizJwjzVxMTSMMXUINnMRFT5d2pDICODpcknJkYGCATxuRnC8jOTUxWSE3NyihkYAPNDI5I="
     private var calltime: TextView? = null
-    protected var agoraEngine: RtcEngine? = null // The RTCEngine instance
+    private val APP_ID = "def8448e122f467e86b87e4491d50c64"
+    // Fill the channel name.
+    private val CHANNEL = "SMD_A2"
+    // Fill the temp token generated on Agora Console.
+    private val TOKEN = "007eJxTYHi84sOKkEa3yvZdyqxXJQ0Y42fru9Va5r9pbd0ve7yM7bICQ0pqmoWJiUWqoZFRmomZeaqFWZKFeaqJiaVhiqlBspmJkvH/1IZARoaHpveYGRkgEMRnYwj2dYl3NGJgAABDQh6J"
+    private var mRtcEngine: RtcEngine ?= null
+    private val mRtcEventHandler = object : IRtcEngineEventHandler() {
+    }
 
+
+    private val PERMISSION_REQ_ID_RECORD_AUDIO = 22
+    private val PERMISSION_REQ_ID_CAMERA = PERMISSION_REQ_ID_RECORD_AUDIO + 1
+
+    private fun checkSelfPermission(permission: String, requestCode: Int): Boolean {
+        if (ContextCompat.checkSelfPermission(this, permission) !=
+            PackageManager.PERMISSION_GRANTED) {
+            ActivityCompat.requestPermissions(this,
+                arrayOf(permission),
+                requestCode)
+            return false
+        }
+        return true
+    }
     @RequiresApi(Build.VERSION_CODES.TIRAMISU)
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -45,51 +70,30 @@ class voice_call : AppCompatActivity() {
             //recievername = bundle.getString("recievername")!!
         }
 
-
-
-        // Initialize the Agora engine
-        initializeAgoraEngine()
-
-        // Join the channel with the same id as chat.id
-        joinChannel(chat.id)
+        if (checkSelfPermission(Manifest.permission.RECORD_AUDIO, PERMISSION_REQ_ID_RECORD_AUDIO)) {
+            initializeAndJoinChannel();
+        }
 
         val endbutton=findViewById<View>(R.id.end_button)
         endbutton.setOnClickListener(View.OnClickListener {
-            leaveChannel()
             finish()
         })
     }
 
-    private fun initializeAgoraEngine() {
-        val rtcEventHandler = object : IRtcEngineEventHandler() {
-            override fun onUserJoined(uid: Int, elapsed: Int) {
-                runOnUiThread {
-                    Log.w("TAG", "User joined")
-                    calltime!!.text = "00:00:00"
-                    callStartedTimeMillis = System.currentTimeMillis()
-                    updateCallTime()
-                }
-            }
+    override fun onDestroy() {
+        super.onDestroy()
+        mRtcEngine?.leaveChannel()
+        RtcEngine.destroy()
+    }
 
-            override fun onUserOffline(uid: Int, reason: Int) {
-                runOnUiThread {
-                    calltime!!.text = "Disconnected"
-                }
-            }
+    private fun initializeAndJoinChannel() {
+        try {
+            mRtcEngine = RtcEngine.create(baseContext, APP_ID, mRtcEventHandler)
+        } catch (e: Exception) {
         }
-
-        mRtcEngine = RtcEngine.create(baseContext, appID, rtcEventHandler)
-        mRtcEngine.setChannelProfile(Constants.CHANNEL_PROFILE_COMMUNICATION)
+        mRtcEngine!!.joinChannel(TOKEN, CHANNEL, "", 0)
     }
 
-    private fun joinChannel(channelid: String) {
-        mRtcEngine.joinChannel(token, channelid, "", 0)
-        calltime!!.text = "Ringing"
-    }
-
-    private fun leaveChannel() {
-        mRtcEngine.leaveChannel()
-    }
 
     private fun updateCallTime() {
         val timer = Timer()
