@@ -5,11 +5,11 @@ class Mentors: Serializable {
     var name: String = ""
     var email: String = ""
     var password: String = ""
-    var job: String = ""
+    var job: String = "Computer Scientist"
     var description: String = ""
     var rating: Double = 0.0
     var profilepic: String = ""
-    var rate: Int = 0
+    var rate: Int = 10
     var status: String = ""
     var token: String = ""
 

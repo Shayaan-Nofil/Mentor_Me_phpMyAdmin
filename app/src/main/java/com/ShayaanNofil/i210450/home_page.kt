@@ -89,12 +89,23 @@ class home_page : AppCompatActivity() {
                 recycle_topmentor.adapter = adapter
                 recycle_education.adapter = adapter
                 recycle_recent.adapter = adapter
+
+                adapter.setOnClickListener(object :
+                    homerecycle_adapter.OnClickListener {
+                    override fun onClick(position: Int, model: Mentors) {
+                        val intent = Intent(this@home_page, john_profile::class.java)
+                        intent.putExtra("object", model)
+                        intent.putExtra("user", user)
+                        startActivity(intent)
+                    }
+                })
             },
             { error ->
                 Log.e("TAG", "Error: ${error.message}", error)
             }
         )
         requestQueue.add(stringRequest)
+
 
 
         val notifbutton=findViewById<View>(R.id.notif_button)

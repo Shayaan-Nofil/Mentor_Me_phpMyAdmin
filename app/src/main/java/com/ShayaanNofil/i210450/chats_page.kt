@@ -14,6 +14,9 @@ import android.widget.Toast
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import chatsearch_recycle_adapter
+import com.android.volley.Request
+import com.android.volley.toolbox.StringRequest
+import com.android.volley.toolbox.Volley
 import com.bumptech.glide.Glide
 import com.google.firebase.Firebase
 import com.google.firebase.auth.FirebaseAuth
@@ -24,69 +27,22 @@ import com.google.firebase.database.DatabaseReference
 import com.google.firebase.database.FirebaseDatabase
 import com.google.firebase.database.ValueEventListener
 import com.google.firebase.database.getValue
+import com.google.gson.JsonObject
+import org.json.JSONArray
 
 private lateinit var mAuth: FirebaseAuth
-private lateinit var database: DatabaseReference
 private lateinit var typeofuser: String
 private lateinit var userchats : MutableList<String>
 class chats_page : AppCompatActivity() {
-
+    lateinit var user: User
+    private var server_ip = "http://192.168.18.70//"
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_chats_page)
-        mAuth = Firebase.auth
 
-        FirebaseDatabase.getInstance().getReference("User").child(mAuth.uid!!).addListenerForSingleValueEvent(object:
-            ValueEventListener {
-            override fun onDataChange(snapshot: DataSnapshot) {
-                if (snapshot.exists()) {
-                    typeofuser = "User"
-                    setrecyclerdata()
-                }
-                else{
-                    typeofuser = "Mentor"
-                    setrecyclerdata()
-                }
+        user = intent.getSerializableExtra("user") as User
 
-                FirebaseDatabase.getInstance().getReference("Chat").addListenerForSingleValueEvent(object:
-                    ValueEventListener {
-                    override fun onDataChange(snapshot: DataSnapshot) {
-                        val chatarray: MutableList<Chats> = mutableListOf()
-                        if (snapshot.exists()){
-                            for (data in snapshot.children){
-                                val myclass = data.getValue(Chats::class.java)
-                                if (myclass != null) {
-                                    if (userchats.contains(myclass.id)){
-                                        chatarray.add(myclass)
-                                    }
-                                }
-                            }
-                            val recycle_chat: RecyclerView = findViewById(R.id.chatpage_recycler_view)
-                            recycle_chat.layoutManager = LinearLayoutManager(this@chats_page)
-                            val adapter = chatsearch_recycle_adapter(chatarray)
-                            recycle_chat.adapter = adapter
-
-                            adapter.setOnClickListener(object :
-                                chatsearch_recycle_adapter.OnClickListener {
-                                override fun onClick(position: Int, model: Chats) {
-                                    val intent = Intent(this@chats_page, individual_chat::class.java)
-                                    intent.putExtra("object", model)
-                                    startActivity(intent)
-                                }
-                            })
-                        }
-                    }
-                    override fun onCancelled(error: DatabaseError) {
-                        Log.w("TAG", "Failed to read value.", error.toException())
-                    }
-                })
-
-
-            }
-            override fun onCancelled(error: DatabaseError) {
-                Log.w("TAG", "Failed to read value.", error.toException())
-            }
-        })
+        getchats()
 
         val backbutton = findViewById<View>(R.id.back_button)
         backbutton.setOnClickListener(View.OnClickListener {
@@ -124,18 +80,65 @@ class chats_page : AppCompatActivity() {
         })
     }
 
-    fun setrecyclerdata(){
-        FirebaseDatabase.getInstance().getReference(typeofuser).child(mAuth.uid!!).child("Chats").addListenerForSingleValueEvent(object:
-            ValueEventListener {
-            override fun onDataChange(snapshot: DataSnapshot) {
-                userchats = mutableListOf()
-                for (data in snapshot.children){
-                    userchats.add(data.getValue(String::class.java).toString())
+    private fun getchats(){
+        val chatarray: MutableList<Chats> = mutableListOf()
+
+        val serverUrl = server_ip + "get_chats.php"
+        val requestQueue = Volley.newRequestQueue(this)
+        val stringRequest = object : StringRequest(
+            Request.Method.POST, serverUrl,
+            { response ->
+                Log.d("Server Response", response)
+                // Parse the JSON response
+                val jsonArray = JSONArray(response)
+
+                // Clear the mentorarray
+                chatarray.clear()
+                // Loop through the JSON array
+                for (i in 0 until jsonArray.length()) {
+                    val jsonObject = jsonArray.getJSONObject(i)
+
+                    // Create a new Mentor object
+                    val mentor = Chats()
+                    mentor.id = jsonObject.getInt("id").toString()
+                    mentor.mentorid = jsonObject.getInt("mentorid")
+                    mentor.userid = jsonObject.getInt("userid")
+                    mentor.messagecount = jsonObject.getInt("messagecount")
+                    mentor.mentorname = jsonObject.getString("mentorname")
+                    mentor.mentorimg = jsonObject.getString("mentorimg")
+                    mentor.username = jsonObject.getString("username")
+                    mentor.userimg = jsonObject.getString("userimg")
+
+                    chatarray.add(mentor)
                 }
+
+                val recycle_chat: RecyclerView = findViewById(R.id.chatpage_recycler_view)
+                recycle_chat.layoutManager = LinearLayoutManager(this@chats_page)
+                val adapter = chatsearch_recycle_adapter(chatarray, user)
+                recycle_chat.adapter = adapter
+
+                adapter.setOnClickListener(object :
+                    chatsearch_recycle_adapter.OnClickListener {
+                    override fun onClick(position: Int, model: Chats) {
+                        val intent = Intent(this@chats_page, individual_chat::class.java)
+                        intent.putExtra("object", model)
+                        intent.putExtra("user", user)
+                        startActivity(intent)
+                    }
+                })
+            },
+            { error ->
+                Log.e("TAG", "Error: ${error.message}", error)
             }
-            override fun onCancelled(error: DatabaseError) {
-                Log.w("TAG", "Failed to read value.", error.toException())
+        ) {
+            override fun getParams(): Map<String, String> {
+                val params = HashMap<String, String>()
+                params["userid"] = user.id
+                return params
             }
-        })
+        }
+
+        requestQueue.add(stringRequest)
     }
+
 }

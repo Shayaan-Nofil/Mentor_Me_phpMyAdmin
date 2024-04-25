@@ -2,6 +2,7 @@ package com.ShayaanNofil.i210450
 
 import Mentors
 import Reviews
+import User
 import android.content.Intent
 import android.graphics.Color
 import androidx.appcompat.app.AppCompatActivity
@@ -12,23 +13,30 @@ import android.widget.Button
 import android.widget.EditText
 import android.widget.ImageButton
 import android.widget.TextView
+import android.widget.Toast
+import com.android.volley.Response
+import com.android.volley.toolbox.StringRequest
+import com.android.volley.toolbox.Volley
 import com.bumptech.glide.Glide
 import com.google.firebase.Firebase
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.auth.auth
 import com.google.firebase.database.DatabaseReference
 import com.google.firebase.database.FirebaseDatabase
+import com.google.gson.Gson
 import de.hdodenhof.circleimageview.CircleImageView
 
 private lateinit var mAuth: FirebaseAuth
 private lateinit var database: DatabaseReference
 class drop_review : AppCompatActivity() {
+    private var server_ip = "http://192.168.18.70//"
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_drop_review)
 
         val mentor: Mentors = intent.getSerializableExtra("object") as Mentors
-        var review: Reviews = Reviews()
+        val user = intent.getSerializableExtra("user") as? User
+        var review = Reviews()
 
         val mentorname: TextView = findViewById(R.id.greeting_text)
         val tempname = "Hi, I'm\n" + mentor.name
@@ -97,20 +105,38 @@ class drop_review : AppCompatActivity() {
         subbutton.setOnClickListener(View.OnClickListener {
             review.mentorid = mentor.id
             review.mentorname = mentor.name
-            mAuth = Firebase.auth
-            review.userid = mAuth.uid!!
+            review.userid = user!!.id
+
             val revdesc : EditText = findViewById(R.id.review_para)
             review.comments = revdesc.text.toString()
 
-            database = FirebaseDatabase.getInstance().getReference("Review")
-            review.id = database.push().key.toString()
+            val serverUrl = server_ip + "create_review.php"
+            val requestQueue = Volley.newRequestQueue(this)
 
-            database.child(review.id).setValue(review).addOnCompleteListener {
-                Log.w("TAG", "Review uploaded")
-                finish()
-            }.addOnFailureListener{
-                Log.w("TAG", "Didnt upload Review")
+            val stringRequest = object : StringRequest(
+                Method.POST, serverUrl,
+                Response.Listener<String> { response ->
+                    // Parse the response from the server
+                    finish()
+                },
+                Response.ErrorListener { error ->
+                    // Handle error
+                    Log.w("TAG", "createUserWithEmail:failure")
+                    val text = "Didn't work"
+                    val duration = Toast.LENGTH_SHORT
+                    val toast = Toast.makeText(this, text, duration) // in Activity
+                    toast.show()
+                }
+            ) {
+                override fun getParams(): Map<String, String> {
+                    val params = HashMap<String, String>()
+                    val gson = Gson()
+                    val userJson = gson.toJson(review)
+                    params["review"] = userJson
+                    return params
+                }
             }
+            requestQueue.add(stringRequest)
         })
 
     }

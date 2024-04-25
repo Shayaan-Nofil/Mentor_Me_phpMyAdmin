@@ -3,6 +3,7 @@ package com.ShayaanNofil.i210450
 import Chats
 import Mentors
 import Sessions
+import User
 import android.content.Intent
 import android.graphics.Color
 import androidx.appcompat.app.AppCompatActivity
@@ -11,31 +12,34 @@ import android.util.Log
 import android.view.View
 import android.widget.Button
 import android.widget.CalendarView
-import android.widget.EditText
-import android.widget.ImageButton
 import android.widget.TextView
+import android.widget.Toast
+import com.android.volley.Request
+import com.android.volley.Response
+import com.android.volley.toolbox.StringRequest
+import com.android.volley.toolbox.Volley
 import com.bumptech.glide.Glide
-import com.google.firebase.Firebase
 import com.google.firebase.auth.FirebaseAuth
-import com.google.firebase.auth.auth
-import com.google.firebase.database.DataSnapshot
-import com.google.firebase.database.DatabaseError
 import com.google.firebase.database.DatabaseReference
-import com.google.firebase.database.FirebaseDatabase
-import com.google.firebase.database.ValueEventListener
+import com.google.gson.Gson
 import de.hdodenhof.circleimageview.CircleImageView
+import org.json.JSONObject
 import java.util.Calendar
 
 private lateinit var mAuth: FirebaseAuth
 private lateinit var database: DatabaseReference
 class book_session : AppCompatActivity() {
+    private var server_ip = "http://192.168.18.70//"
+    lateinit var mentor: Mentors
+    lateinit var user: User
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_book_session)
         var session : Sessions = Sessions()
         session.time = "11:00am"
 
-        val mentor: Mentors = intent.getSerializableExtra("object") as Mentors
+        mentor = intent.getSerializableExtra("object") as Mentors
+        user = intent.getSerializableExtra("user") as User
 
         if (mentor != null){
             val mentorname: TextView = findViewById(R.id.name_text)
@@ -107,87 +111,40 @@ class book_session : AppCompatActivity() {
             session.mentorimg = mentor.profilepic
             session.mentorname = mentor.name
             session.mentorjob = mentor.job
-            mAuth = Firebase.auth
-            session.userid = mAuth.uid!!
+            session.userid = user.id
 
-            database = FirebaseDatabase.getInstance().getReference("Session")
-            session.id = database.push().key.toString()
+            val serverUrl = server_ip + "create_session.php"
+            val requestQueue = Volley.newRequestQueue(this)
 
-            database.child(session.id).setValue(session).addOnCompleteListener {
-                Log.w("TAG", "Review uploaded")
-                finish()
-            }.addOnFailureListener{
-                Log.w("TAG", "Didnt upload Review")
+            val stringRequest = object : StringRequest(
+                Method.POST, serverUrl,
+                Response.Listener<String> { response ->
+                    // Parse the response from the server
+                    finish()
+                },
+                Response.ErrorListener { error ->
+                    // Handle error
+                    Log.w("TAG", "createUserWithEmail:failure")
+                    val text = "Didn't work"
+                    val duration = Toast.LENGTH_SHORT
+                    val toast = Toast.makeText(this, text, duration) // in Activity
+                    toast.show()
+                }
+            ) {
+                override fun getParams(): Map<String, String> {
+                    val params = HashMap<String, String>()
+                    val gson = Gson()
+                    val userJson = gson.toJson(session)
+                    params["session"] = userJson
+                    return params
+                }
             }
+            requestQueue.add(stringRequest)
         })
 
         val messagebutton=findViewById<View>(R.id.message_button)
         messagebutton.setOnClickListener(View.OnClickListener {
-            mAuth = Firebase.auth
-            session.userid = mAuth.uid!!
-            var chat : Chats = Chats()
-            var exists : Boolean = false
-
-            database = FirebaseDatabase.getInstance().getReference("User").child(mAuth.uid!!).child("Chats")
-            var userchatarray: MutableList<String> = mutableListOf()
-
-            database.addListenerForSingleValueEvent(object : ValueEventListener {
-                override fun onDataChange(snapshot: DataSnapshot) {
-                    if (snapshot.exists()){
-                        for (data in snapshot.children){
-                            val myclass = data.getValue(String::class.java)
-                            if (myclass != null) {
-                                userchatarray.add(myclass)
-                            }
-                        }
-                        database = FirebaseDatabase.getInstance().getReference("Mentor").child(mentor.id).child("Chats")
-
-                        database.addListenerForSingleValueEvent(object : ValueEventListener {
-                            override fun onDataChange(snapshot: DataSnapshot) {
-                                if (snapshot.exists()){
-                                    for (data in snapshot.children){
-                                        val myclass = data.getValue(String::class.java)
-                                        for (temp in userchatarray){
-                                            if (myclass != null) {
-                                                Log.w("TAG", temp)
-                                                Log.w("TAG", myclass)
-                                                if (temp == myclass){
-                                                    exists = true
-                                                    Log.w("TAG", "Chat exists")
-                                                    FirebaseDatabase.getInstance().getReference("Chat").child(temp).addListenerForSingleValueEvent(object : ValueEventListener {
-                                                        override fun onDataChange(snapshot: DataSnapshot) {
-                                                            if (snapshot.exists()){
-                                                                val temp = snapshot.getValue(Chats::class.java)
-                                                                if (temp != null){
-                                                                    chat.id = temp.id
-                                                                    chat.pic = temp.pic
-                                                                    val temp = Intent(this@book_session, individual_chat::class.java )
-                                                                    Log.w("TAG","Opening chat")
-                                                                    exists = true
-                                                                    temp.putExtra("object", chat)
-                                                                    startActivity(temp)
-                                                                }
-                                                            }
-                                                        }
-                                                        override fun onCancelled(error: DatabaseError){}
-                                                    })
-                                                }
-                                            }
-                                        }
-                                    }
-
-                                }else {
-                                    createchat(mentor)
-                                }
-                            }
-                            override fun onCancelled(error: DatabaseError){}
-                        })
-                    }else {
-                        createchat(mentor)
-                    }
-                }
-                override fun onCancelled(error: DatabaseError){}
-            })
+            checkchat()
         })
 
         val callbutton=findViewById<View>(R.id.call_button)
@@ -203,27 +160,83 @@ class book_session : AppCompatActivity() {
         })
     }
 
-    private fun createchat(mentor: Mentors){
-        val chat : Chats = Chats()
-        database = FirebaseDatabase.getInstance().getReference("Chat").child(chat.id)
+    private fun createchat(){
+        var chats = Chats()
+        chats.mentorid = mentor.id.toInt()
+        chats.userid = user.id.toInt()
+        chats.mentorname = mentor.name
+        chats.mentorimg = mentor.profilepic
+        chats.username = user.name
+        chats.userimg = user.profilepic
 
-        chat.id = database.push().key.toString()
-        chat.pic = mentor.profilepic
-        database.child(chat.id).setValue(chat).addOnCompleteListener {
-            Log.w("TAG", "Review uploaded")
-            finish()
-        }.addOnFailureListener{
-            Log.w("TAG", "Didnt upload Review")
+        val serverUrl = server_ip + "create_chat.php"
+        val requestQueue = Volley.newRequestQueue(this)
+
+        val stringRequest = object : StringRequest(
+            Method.POST, serverUrl,
+            Response.Listener<String> { response ->
+                checkchat()
+            },
+            Response.ErrorListener { error ->
+                // Handle error
+                Log.w("TAG", "createUserWithEmail:failure")
+                val text = "Didn't work"
+                val duration = Toast.LENGTH_SHORT
+                val toast = Toast.makeText(this, text, duration) // in Activity
+                toast.show()
+            }
+        ) {
+            override fun getParams(): Map<String, String> {
+                val params = HashMap<String, String>()
+                val gson = Gson()
+                val userJson = gson.toJson(chats)
+                params["chats"] = userJson
+                return params
+            }
+        }
+        requestQueue.add(stringRequest)
+    }
+
+    private fun checkchat(){
+        val serverUrl = server_ip + "check_chat.php"
+        val requestQueue = Volley.newRequestQueue(this)
+        val stringRequest = object : StringRequest(
+            Request.Method.POST, serverUrl,
+            { response ->
+                Log.d("Server Response", response)
+
+                if (response.trim().startsWith("{")) {
+                    val userJson = JSONObject(response)
+                    val chat = Chats()
+                    chat.id = userJson.getInt("id").toString()
+                    chat.userid = userJson.getInt("userid")
+                    chat.mentorid = userJson.getInt("mentorid")
+                    chat.mentorname = userJson.getString("mentorname")
+                    chat.mentorimg = userJson.getString("mentorimg")
+                    chat.username = userJson.getString("username")
+                    chat.userimg = userJson.getString("userimg")
+
+                    val temp = Intent(this, individual_chat::class.java )
+                    temp.putExtra("chat", chat)
+                    temp.putExtra("user", user)
+                    startActivity(temp)
+                } else {
+                    Log.w("TAG", "No chat found")
+                    createchat()
+                }
+            },
+            { error ->
+                Log.e("TAG", "Error: ${error.message}", error)
+            }
+        ) {
+            override fun getParams(): Map<String, String> {
+                val params = HashMap<String, String>()
+                params["userid"] = user.id
+                params["mentorid"] = mentor.id
+                return params
+            }
         }
 
-        database = FirebaseDatabase.getInstance().getReference("User").child(mAuth.uid!!)
-        database.child("Chats").child(chat.id).setValue(chat.id)
-
-        database = FirebaseDatabase.getInstance().getReference("Mentor").child(mentor.id)
-        database.child("Chats").child(chat.id).setValue(chat.id)
-
-        val temp = Intent(this@book_session, individual_chat::class.java )
-        temp.putExtra("object", chat)
-        startActivity(temp)
+        requestQueue.add(stringRequest)
     }
 }

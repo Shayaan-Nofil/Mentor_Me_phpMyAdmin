@@ -1,11 +1,11 @@
 package com.ShayaanNofil.i210450
 
 import Mentors
+import User
 import android.content.Intent
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
 import android.view.View
-import android.widget.ImageView
 import android.widget.TextView
 import com.bumptech.glide.Glide
 import de.hdodenhof.circleimageview.CircleImageView
@@ -16,6 +16,7 @@ class john_profile() : AppCompatActivity() {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_john_profile)
         val mentor: Mentors = intent.getSerializableExtra("object") as Mentors
+        val user = intent.getSerializableExtra("user") as? User
 
         var mentorname: TextView = findViewById(R.id.name_text)
         val tempname = "Hi, I'm\n" + mentor.name
@@ -42,6 +43,7 @@ class john_profile() : AppCompatActivity() {
         revbutton.setOnClickListener(View.OnClickListener {
             val temp = Intent(this, drop_review::class.java )
             temp.putExtra("object", mentor)
+            temp.putExtra("user", user)
             startActivity(temp)
         })
 

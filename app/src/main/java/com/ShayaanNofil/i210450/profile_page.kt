@@ -37,6 +37,7 @@ import com.google.firebase.database.FirebaseDatabase
 import com.google.firebase.database.ValueEventListener
 import com.google.firebase.storage.FirebaseStorage
 import de.hdodenhof.circleimageview.CircleImageView
+import org.json.JSONArray
 import org.json.JSONObject
 import java.io.ByteArrayOutputStream
 import kotlin.random.Random
@@ -66,90 +67,59 @@ class profile_page : AppCompatActivity() {
         updateimg()
 
 
-//        mAuth = Firebase.auth
-//        var userId = mAuth.uid;
-//        usr = User()
-//        usr.id = userId!!
-//        database = FirebaseDatabase.getInstance().getReference("User").child(userId)
-//
-//        database.addListenerForSingleValueEvent(object : ValueEventListener {
-//            override fun onDataChange(snapshot: DataSnapshot) {
-//                //usr.id = snapshot.child("id").value.toString()
-//                usr.name = snapshot.child("name").value.toString()
-//                usr.email = snapshot.child("email").value.toString()
-//                usr.country = snapshot.child("country").value.toString()
-//                usr.city = snapshot.child("city").value.toString()
-//                usr.number = snapshot.child("number").value.toString()
-//                usr.profilepic = snapshot.child("profilepic").value.toString()
-//                usr.bgpic = snapshot.child("bgpic").value.toString()
-//                nametext.text = usr.name
-//                usr.bgpic = usr.bgpic
-//                updateimg()
-//            }
-//            override fun onCancelled(error: DatabaseError){}
-//        })
-//
-//        val recycle_topmentor: RecyclerView = findViewById(R.id.recycle_favorite_mentors)
-//        recycle_topmentor.layoutManager = LinearLayoutManager(this,LinearLayoutManager.HORIZONTAL, false)
-//        val mentorarray: MutableList<Mentors> = mutableListOf()
-//
-//        FirebaseDatabase.getInstance().getReference("Mentor").addValueEventListener(object: ValueEventListener{
-//            override fun onDataChange(snapshot: DataSnapshot) {
-//                mentorarray.clear()
-//                if (snapshot.exists()){
-//                    for (data in snapshot.children){
-//                        val myclass = data.getValue(Mentors::class.java)
-//                        mentorarray.add(myclass!!)
-//                    }
-//
-//                    val adapter = homerecycle_adapter(mentorarray)
-//                    recycle_topmentor.adapter = adapter
-//
-//                    adapter.setOnClickListener(object :
-//                        homerecycle_adapter.OnClickListener {
-//                        override fun onClick(position: Int, model: Mentors) {
-//                            val intent = Intent(this@profile_page, john_profile::class.java)
-//                            intent.putExtra("object", model)
-//                            startActivity(intent)
-//                        }
-//                    })
-//
-//                }
-//            }
-//            override fun onCancelled(error: DatabaseError) {
-//                TODO("Not yet implemented")
-//            }
-//        })
-//
-//
-//
-//
-//        val recycle_reviews: RecyclerView = findViewById(R.id.recycle_reviews)
-//        recycle_reviews.layoutManager = LinearLayoutManager(this, LinearLayoutManager.HORIZONTAL, false)
-//        val reviewarray: MutableList<Reviews> = mutableListOf()
-//
-//        FirebaseDatabase.getInstance().getReference("Review").addValueEventListener(object: ValueEventListener{
-//            override fun onDataChange(snapshot: DataSnapshot) {
-//                reviewarray.clear()
-//                if (snapshot.exists()){
-//                    for (data in snapshot.children){
-//                        val myclass = data.getValue(Reviews::class.java)
-//                        if (myclass != null) {
-//                            if (myclass.userid == userId)
-//                                reviewarray.add(myclass)
-//                        }
-//                    }
-//
-//                    val adapter = review_recycle_adapter(reviewarray)
-//                    recycle_reviews.adapter = adapter
-//
-//                }
-//            }
-//            override fun onCancelled(error: DatabaseError) {
-//                TODO("Not yet implemented")
-//            }
-//        })
+        val recycle_topmentor: RecyclerView = findViewById(R.id.recycle_favorite_mentors)
+        recycle_topmentor.layoutManager = LinearLayoutManager(this,LinearLayoutManager.HORIZONTAL, false)
+        val mentorarray: MutableList<Mentors> = mutableListOf()
+        val serverUrl = server_ip + "getall_mentors.php"
+        val requestQueue = Volley.newRequestQueue(this)
+        val stringRequest = StringRequest(
+            Request.Method.GET, serverUrl,
+            { response ->
+                // Parse the JSON response
+                val jsonArray = JSONArray(response)
 
+                // Clear the mentorarray
+                mentorarray.clear()
+
+                // Loop through the JSON array
+                for (i in 0 until jsonArray.length()) {
+                    val jsonObject = jsonArray.getJSONObject(i)
+
+                    // Create a new Mentor object
+                    val mentor = Mentors()
+                    mentor.id = jsonObject.getString("id")
+                    mentor.name = jsonObject.getString("name")
+                    mentor.email = jsonObject.getString("email")
+                    mentor.job = jsonObject.getString("job")
+                    mentor.description = jsonObject.getString("description")
+                    mentor.rating = jsonObject.getDouble("rating")
+                    mentor.profilepic = jsonObject.getString("profilepic")
+                    mentor.rate = jsonObject.getInt("rate")
+                    mentor.status = jsonObject.getString("status")
+
+                    mentorarray.add(mentor)
+                }
+
+                val adapter = homerecycle_adapter(mentorarray)
+                recycle_topmentor.adapter = adapter
+
+                adapter.setOnClickListener(object :
+                    homerecycle_adapter.OnClickListener {
+                    override fun onClick(position: Int, model: Mentors) {
+                        val intent = Intent(this@profile_page, john_profile::class.java)
+                        intent.putExtra("object", model)
+                        intent.putExtra("user", usr)
+                        startActivity(intent)
+                    }
+                })
+            },
+            { error ->
+                Log.e("TAG", "Error: ${error.message}", error)
+            }
+        )
+        requestQueue.add(stringRequest)
+
+        getreviews()
 
         val editbutton=findViewById<View>(R.id.edit_pfpic_bt)
         editbutton.setOnClickListener {
@@ -174,36 +144,42 @@ class profile_page : AppCompatActivity() {
         val sessionbutton=findViewById<View>(R.id.sessions_button)
         sessionbutton.setOnClickListener(View.OnClickListener {
             val temp = Intent(this, booked_sessions::class.java )
+            temp.putExtra("user", usr)
             startActivity(temp)
         })
 
         val task_homebutton=findViewById<View>(R.id.bthome)
         task_homebutton.setOnClickListener(View.OnClickListener {
             val temp = Intent(this, home_page::class.java )
+            temp.putExtra("user", usr)
             startActivity(temp)
         })
 
         val task_searchbutton=findViewById<View>(R.id.btsearch)
         task_searchbutton.setOnClickListener(View.OnClickListener {
             val temp = Intent(this, Search::class.java )
+            temp.putExtra("user", usr)
             startActivity(temp)
         })
 
         val task_chatbutton=findViewById<View>(R.id.btchat)
         task_chatbutton.setOnClickListener(View.OnClickListener {
             val temp = Intent(this, chats_page::class.java )
+            temp.putExtra("user", usr)
             startActivity(temp)
         })
 
         val task_profilebutton=findViewById<View>(R.id.btprofile)
         task_profilebutton.setOnClickListener(View.OnClickListener {
             val temp = Intent(this, profile_page::class.java )
+            temp.putExtra("user", usr)
             startActivity(temp)
         })
 
         val task_addcontent=findViewById<View>(R.id.btaddcontent)
         task_addcontent.setOnClickListener(View.OnClickListener {
             val temp = Intent(this, addnew_mentor::class.java )
+            temp.putExtra("user", usr)
             startActivity(temp)
         })
     }
@@ -350,5 +326,56 @@ class profile_page : AppCompatActivity() {
                 return params
             }
         }
+    }
+
+    private fun getreviews(){
+        val recycle_reviews: RecyclerView = findViewById(R.id.recycle_reviews)
+        recycle_reviews.layoutManager = LinearLayoutManager(this, LinearLayoutManager.HORIZONTAL, false)
+        val reviewarray: MutableList<Reviews> = mutableListOf()
+
+        Log.w("TAG", "In function")
+
+        val serverUrl = server_ip + "get_reviews.php"
+        val requestQueue = Volley.newRequestQueue(this)
+        val stringRequest = object : StringRequest(
+            Request.Method.POST, serverUrl,
+            { response ->
+                Log.d("Server Response", response)
+                // Parse the JSON response
+                val jsonArray = JSONArray(response)
+
+                // Clear the mentorarray
+                reviewarray.clear()
+                // Loop through the JSON array
+                for (i in 0 until jsonArray.length()) {
+                    val jsonObject = jsonArray.getJSONObject(i)
+
+                    // Create a new Mentor object
+                    val mentor = Reviews()
+                    mentor.id = jsonObject.getInt("id").toString()
+                    mentor.mentorid = jsonObject.getInt("mentorid").toString()
+                    mentor.mentorname = jsonObject.getString("mentorname")
+                    mentor.userid = jsonObject.getInt("userid").toString()
+                    mentor.comments = jsonObject.getString("comments")
+                    mentor.rating = jsonObject.getDouble("rating")
+
+                    reviewarray.add(mentor)
+                }
+
+                val adapter = review_recycle_adapter(reviewarray)
+                recycle_reviews.adapter = adapter
+            },
+            { error ->
+                Log.e("TAG", "Error: ${error.message}", error)
+            }
+        ) {
+            override fun getParams(): Map<String, String> {
+                val params = HashMap<String, String>()
+                params["userid"] = usr.id
+                return params
+            }
+        }
+
+        requestQueue.add(stringRequest)
     }
 }

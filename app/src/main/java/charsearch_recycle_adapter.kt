@@ -19,7 +19,7 @@ import de.hdodenhof.circleimageview.CircleImageView
 private lateinit var mAuth: FirebaseAuth
 private lateinit var database: DatabaseReference
 private lateinit var typeofuser: String
-class chatsearch_recycle_adapter(private val items: MutableList<Chats>): RecyclerView.Adapter<chatsearch_recycle_adapter.ViewHolder>() {
+class chatsearch_recycle_adapter(private val items: MutableList<Chats>, private val user: User): RecyclerView.Adapter<chatsearch_recycle_adapter.ViewHolder>() {
     private lateinit var onClickListener: chatsearch_recycle_adapter.OnClickListener
 
     class ViewHolder (itemview: View): RecyclerView.ViewHolder(itemview){
@@ -39,24 +39,20 @@ class chatsearch_recycle_adapter(private val items: MutableList<Chats>): Recycle
     }
     override fun onBindViewHolder(holder: chatsearch_recycle_adapter.ViewHolder, position: Int) {
         val chat = items[position]
-        mAuth = Firebase.auth
+        if (user.id.toInt() == chat.userid){
+            holder.personname.text = chat.mentorname
 
-        FirebaseDatabase.getInstance().getReference("User").child(mAuth.uid!!).addListenerForSingleValueEvent(object:
-            ValueEventListener {
-            override fun onDataChange(snapshot: DataSnapshot) {
-                if (snapshot.exists()) {
-                    typeofuser = "Mentor"
-                    setrecyclerdata(holder, chat)
-                }
-                else{
-                    typeofuser = "User"
-                    setrecyclerdata(holder, chat)
-                }
-            }
-            override fun onCancelled(error: DatabaseError) {
-                Log.w("TAG", "Failed to read value.", error.toException())
-            }
-        })
+            Glide.with(holder.itemView)
+                .load(chat.mentorimg)
+                .into(holder.profleimg)
+        }
+        else{
+            holder.personname.text = chat.username
+
+            Glide.with(holder.itemView)
+                .load(chat.userimg)
+                .into(holder.profleimg)
+        }
 
         val countstring = chat.messagecount.toString() + " New Messages"
         holder.missmessagecount.text = countstring
@@ -75,68 +71,6 @@ class chatsearch_recycle_adapter(private val items: MutableList<Chats>): Recycle
     // onClickListener Interface
     interface OnClickListener {
         fun onClick(position: Int, model: Chats)
-    }
-
-    fun setrecyclerdata(holder: chatsearch_recycle_adapter.ViewHolder, chat: Chats){
-        FirebaseDatabase.getInstance().getReference(typeofuser).addListenerForSingleValueEvent(object:
-            ValueEventListener {
-            override fun onDataChange(snapshot: DataSnapshot) {
-                for (data in snapshot.children){
-                    if (typeofuser == "Mentor"){
-                        val mentor = data.getValue(Mentors::class.java)
-                        if (mentor != null) {
-                            FirebaseDatabase.getInstance().getReference(typeofuser).child(mentor.id).child("Chats").addListenerForSingleValueEvent(object : ValueEventListener {
-                                override fun onDataChange(snapshot: DataSnapshot) {
-                                    if (snapshot.exists()) {
-                                        for (data in snapshot.children) {
-                                            val chats = data.getValue(String::class.java)
-                                            if (chats != null) {
-                                                if (chats == chat.id) {
-                                                    holder.personname.text = mentor.name
-
-                                                    Glide.with(holder.itemView)
-                                                        .load(mentor.profilepic)
-                                                        .into(holder.profleimg)
-//
-                                                }
-                                            }
-                                        }
-                                    }
-                                }
-                                override fun onCancelled(error: DatabaseError) {}
-                            })
-                        }
-                    }else{
-                        val mentor = data.getValue(User::class.java)
-                        if (mentor != null) {
-                            FirebaseDatabase.getInstance().getReference(typeofuser).child(mentor.id).child("Chats").addListenerForSingleValueEvent(object : ValueEventListener {
-                                override fun onDataChange(snapshot: DataSnapshot) {
-                                    if (snapshot.exists()) {
-                                        for (data in snapshot.children) {
-                                            val chats = data.getValue(String::class.java)
-                                            if (chats != null) {
-                                                if (chats == chat.id) {
-                                                    holder.personname.text = mentor.name
-
-                                                    Glide.with(holder.itemView)
-                                                        .load(mentor.profilepic)
-                                                        .into(holder.profleimg)
-//
-                                                }
-                                            }
-                                        }
-                                    }
-                                }
-                                override fun onCancelled(error: DatabaseError) {}
-                            })
-                        }
-                    }
-                }
-            }
-            override fun onCancelled(error: DatabaseError) {
-                Log.w("TAG", "Failed to read value.", error.toException())
-            }
-        })
     }
 
 }
