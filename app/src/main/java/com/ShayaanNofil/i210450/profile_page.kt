@@ -5,19 +5,27 @@ import Reviews
 import User
 import android.content.DialogInterface
 import android.content.Intent
+import android.graphics.Bitmap
 import android.net.Uri
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
+import android.provider.MediaStore
+import android.util.Base64
 import android.util.Log
 import android.view.View
 import android.widget.Button
 import android.widget.ImageButton
 import android.widget.ImageView
 import android.widget.TextView
+import android.widget.Toast
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.appcompat.app.AlertDialog
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
+import com.android.volley.Request
+import com.android.volley.Response
+import com.android.volley.toolbox.StringRequest
+import com.android.volley.toolbox.Volley
 import com.bumptech.glide.Glide
 import com.google.firebase.Firebase
 import com.google.firebase.auth.FirebaseAuth
@@ -29,6 +37,8 @@ import com.google.firebase.database.FirebaseDatabase
 import com.google.firebase.database.ValueEventListener
 import com.google.firebase.storage.FirebaseStorage
 import de.hdodenhof.circleimageview.CircleImageView
+import org.json.JSONObject
+import java.io.ByteArrayOutputStream
 import kotlin.random.Random
 
 private lateinit var storage: FirebaseStorage
@@ -40,97 +50,105 @@ class profile_page : AppCompatActivity() {
     private var profilePictureUri: Uri? = null
     private var backPictureUri: Uri? = null
     lateinit var usr: User
+    var img: Bitmap?=null
+    private var server_ip = "http://192.168.18.70//"
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_profile_page)
 
-        mAuth = Firebase.auth
-        var userId = mAuth.uid;
-        usr = User()
-        usr.id = userId!!
-        database = FirebaseDatabase.getInstance().getReference("User").child(userId)
-
-        var nametext: TextView = findViewById(R.id.username_text)
         profilepicimg = findViewById(R.id.ali_profilepic)
         bgpicimg = findViewById(R.id.background_img)
 
-        database.addListenerForSingleValueEvent(object : ValueEventListener {
-            override fun onDataChange(snapshot: DataSnapshot) {
-                //usr.id = snapshot.child("id").value.toString()
-                usr.name = snapshot.child("name").value.toString()
-                usr.email = snapshot.child("email").value.toString()
-                usr.country = snapshot.child("country").value.toString()
-                usr.city = snapshot.child("city").value.toString()
-                usr.number = snapshot.child("number").value.toString()
-                usr.profilepic = snapshot.child("profilepic").value.toString()
-                usr.bgpic = snapshot.child("bgpic").value.toString()
-                nametext.text = usr.name
-                usr.bgpic = usr.bgpic
-                updateimg()
-            }
-            override fun onCancelled(error: DatabaseError){}
-        })
-
-        val recycle_topmentor: RecyclerView = findViewById(R.id.recycle_favorite_mentors)
-        recycle_topmentor.layoutManager = LinearLayoutManager(this,LinearLayoutManager.HORIZONTAL, false)
-        val mentorarray: MutableList<Mentors> = mutableListOf()
-
-        FirebaseDatabase.getInstance().getReference("Mentor").addValueEventListener(object: ValueEventListener{
-            override fun onDataChange(snapshot: DataSnapshot) {
-                mentorarray.clear()
-                if (snapshot.exists()){
-                    for (data in snapshot.children){
-                        val myclass = data.getValue(Mentors::class.java)
-                        mentorarray.add(myclass!!)
-                    }
-
-                    val adapter = homerecycle_adapter(mentorarray)
-                    recycle_topmentor.adapter = adapter
-
-                    adapter.setOnClickListener(object :
-                        homerecycle_adapter.OnClickListener {
-                        override fun onClick(position: Int, model: Mentors) {
-                            val intent = Intent(this@profile_page, john_profile::class.java)
-                            intent.putExtra("object", model)
-                            startActivity(intent)
-                        }
-                    })
-
-                }
-            }
-            override fun onCancelled(error: DatabaseError) {
-                TODO("Not yet implemented")
-            }
-        })
+        usr = intent.getSerializableExtra("user") as User
+        val nametext: TextView = findViewById(R.id.username_text)
+        nametext.text = usr.name
+        getdata()
+        updateimg()
 
 
-
-
-        val recycle_reviews: RecyclerView = findViewById(R.id.recycle_reviews)
-        recycle_reviews.layoutManager = LinearLayoutManager(this, LinearLayoutManager.HORIZONTAL, false)
-        val reviewarray: MutableList<Reviews> = mutableListOf()
-
-        FirebaseDatabase.getInstance().getReference("Review").addValueEventListener(object: ValueEventListener{
-            override fun onDataChange(snapshot: DataSnapshot) {
-                reviewarray.clear()
-                if (snapshot.exists()){
-                    for (data in snapshot.children){
-                        val myclass = data.getValue(Reviews::class.java)
-                        if (myclass != null) {
-                            if (myclass.userid == userId)
-                                reviewarray.add(myclass)
-                        }
-                    }
-
-                    val adapter = review_recycle_adapter(reviewarray)
-                    recycle_reviews.adapter = adapter
-
-                }
-            }
-            override fun onCancelled(error: DatabaseError) {
-                TODO("Not yet implemented")
-            }
-        })
+//        mAuth = Firebase.auth
+//        var userId = mAuth.uid;
+//        usr = User()
+//        usr.id = userId!!
+//        database = FirebaseDatabase.getInstance().getReference("User").child(userId)
+//
+//        database.addListenerForSingleValueEvent(object : ValueEventListener {
+//            override fun onDataChange(snapshot: DataSnapshot) {
+//                //usr.id = snapshot.child("id").value.toString()
+//                usr.name = snapshot.child("name").value.toString()
+//                usr.email = snapshot.child("email").value.toString()
+//                usr.country = snapshot.child("country").value.toString()
+//                usr.city = snapshot.child("city").value.toString()
+//                usr.number = snapshot.child("number").value.toString()
+//                usr.profilepic = snapshot.child("profilepic").value.toString()
+//                usr.bgpic = snapshot.child("bgpic").value.toString()
+//                nametext.text = usr.name
+//                usr.bgpic = usr.bgpic
+//                updateimg()
+//            }
+//            override fun onCancelled(error: DatabaseError){}
+//        })
+//
+//        val recycle_topmentor: RecyclerView = findViewById(R.id.recycle_favorite_mentors)
+//        recycle_topmentor.layoutManager = LinearLayoutManager(this,LinearLayoutManager.HORIZONTAL, false)
+//        val mentorarray: MutableList<Mentors> = mutableListOf()
+//
+//        FirebaseDatabase.getInstance().getReference("Mentor").addValueEventListener(object: ValueEventListener{
+//            override fun onDataChange(snapshot: DataSnapshot) {
+//                mentorarray.clear()
+//                if (snapshot.exists()){
+//                    for (data in snapshot.children){
+//                        val myclass = data.getValue(Mentors::class.java)
+//                        mentorarray.add(myclass!!)
+//                    }
+//
+//                    val adapter = homerecycle_adapter(mentorarray)
+//                    recycle_topmentor.adapter = adapter
+//
+//                    adapter.setOnClickListener(object :
+//                        homerecycle_adapter.OnClickListener {
+//                        override fun onClick(position: Int, model: Mentors) {
+//                            val intent = Intent(this@profile_page, john_profile::class.java)
+//                            intent.putExtra("object", model)
+//                            startActivity(intent)
+//                        }
+//                    })
+//
+//                }
+//            }
+//            override fun onCancelled(error: DatabaseError) {
+//                TODO("Not yet implemented")
+//            }
+//        })
+//
+//
+//
+//
+//        val recycle_reviews: RecyclerView = findViewById(R.id.recycle_reviews)
+//        recycle_reviews.layoutManager = LinearLayoutManager(this, LinearLayoutManager.HORIZONTAL, false)
+//        val reviewarray: MutableList<Reviews> = mutableListOf()
+//
+//        FirebaseDatabase.getInstance().getReference("Review").addValueEventListener(object: ValueEventListener{
+//            override fun onDataChange(snapshot: DataSnapshot) {
+//                reviewarray.clear()
+//                if (snapshot.exists()){
+//                    for (data in snapshot.children){
+//                        val myclass = data.getValue(Reviews::class.java)
+//                        if (myclass != null) {
+//                            if (myclass.userid == userId)
+//                                reviewarray.add(myclass)
+//                        }
+//                    }
+//
+//                    val adapter = review_recycle_adapter(reviewarray)
+//                    recycle_reviews.adapter = adapter
+//
+//                }
+//            }
+//            override fun onCancelled(error: DatabaseError) {
+//                TODO("Not yet implemented")
+//            }
+//        })
 
 
         val editbutton=findViewById<View>(R.id.edit_pfpic_bt)
@@ -194,7 +212,10 @@ class profile_page : AppCompatActivity() {
         if (uri != null){
             profilePictureUri = uri
             usr.profilepic = uri.toString()
-            updateprofilepic()
+            img = MediaStore.Images.Media.getBitmap(contentResolver,uri)
+            Glide.with(this).load(uri).into(profilepicimg)
+
+            updatepictures("profilepic")
         }
     }
     private val gallerybackgroundLauncher = registerForActivityResult(ActivityResultContracts.GetContent()) { uri ->
@@ -202,7 +223,10 @@ class profile_page : AppCompatActivity() {
         if (uri != null){
             backPictureUri = uri
             usr.bgpic = uri.toString()
-            updatebackgroundpic()
+            img = MediaStore.Images.Media.getBitmap(contentResolver,uri)
+            Glide.with(this).load(uri).into(bgpicimg)
+
+            updatepictures("bgpic")
         }
     }
     private fun openGalleryForImage() {
@@ -213,50 +237,54 @@ class profile_page : AppCompatActivity() {
         gallerybackgroundLauncher.launch("image/*")
     }
 
+    private fun updatepictures(typepic: String) {
+        val requestQueue = Volley.newRequestQueue(this)
+        val serverUrl = server_ip + "uploaddp.php"
 
-    private fun updateprofilepic(){
-        storage = FirebaseStorage.getInstance()
-        val storageref = storage.reference
-        val userId = mAuth.uid;
+        val stringRequest = object : StringRequest(
+            Request.Method.POST,
+            serverUrl,
+            Response.Listener { response ->
+                Toast.makeText(this, response, Toast.LENGTH_LONG).show()
+                Log.e("response", response)
+                val res = JSONObject(response)
+                var url = "http://192.168.18.70/" + res.get("url")
 
-        profilePictureUri?. let{
-            storageref.child(userId!! + Random.nextInt(0,100000).toString()).putFile(profilePictureUri!!).addOnSuccessListener {
-                it.metadata!!.reference!!.downloadUrl.addOnSuccessListener {task ->
-                    usr.profilepic = task.toString()
-                    Log.w("TAG", "Upload Success")
-
-                    database.setValue(usr).addOnSuccessListener {
-                        profilepicimg.setImageURI(profilePictureUri)
-                    }
+                if (typepic == "profilepic"){
+                    usr.profilepic = url
                 }
-            }.addOnFailureListener{
-                Log.w("TAG", "Upload failed")
+                else{
+                    usr.bgpic = url
+                }
+
+            },
+            Response.ErrorListener { error ->
+                Toast.makeText(this, error.toString(), Toast.LENGTH_LONG).show()
+                Log.e("error", error.toString())
+            }
+        ) {
+            override fun getParams(): MutableMap<String, String> {
+                val params = HashMap<String, String>()
+                params["userid"] = usr.id
+                params["pictype"] = typepic
+                params.put("image",bitmapToBase64(img!!))
+                return params
             }
         }
+        requestQueue.add(stringRequest)
     }
 
-    private fun updatebackgroundpic(){
-        storage = FirebaseStorage.getInstance()
-        val storageref = storage.reference
-        val userId = mAuth.uid;
+    fun bitmapToBase64(dp:Bitmap):String{
+        var stream= ByteArrayOutputStream()
+        dp.compress(Bitmap.CompressFormat.JPEG,100,stream)
+        stream.toByteArray()
+        return Base64.encodeToString(stream.toByteArray(), Base64.DEFAULT).toString()
 
-        backPictureUri?. let{
-            storageref.child(userId!! + Random.nextInt(0,100000).toString()).putFile(backPictureUri!!).addOnSuccessListener {
-                it.metadata!!.reference!!.downloadUrl.addOnSuccessListener {task ->
-                    usr.bgpic = task.toString()
-                    Log.w("TAG", "Upload Success")
-
-                    database.setValue(usr).addOnSuccessListener {
-                        bgpicimg.setImageURI(backPictureUri)
-                    }
-                }
-            }.addOnFailureListener{
-                Log.w("TAG", "Upload failed")
-            }
-        }
     }
+
     fun updateimg(){
         if (usr.profilepic.isNotEmpty()){
+            Log.w("TAG", "Updating image")
             Glide.with(this)
                 .load(usr.profilepic)
                 .into(profilepicimg)
@@ -275,7 +303,9 @@ class profile_page : AppCompatActivity() {
         builder.setItems(options) { dialogInterface: DialogInterface, which: Int ->
             when (which) {
                 0 -> {
-                    startActivity(Intent(this, edit_profile::class.java))
+                    val temp = Intent(this, edit_profile::class.java )
+                    temp.putExtra("user", usr)
+                    startActivity(temp)
                 }
                 1 -> {
                     FirebaseAuth.getInstance().signOut()
@@ -287,5 +317,38 @@ class profile_page : AppCompatActivity() {
             }
         }
         builder.create().show()
+    }
+
+    private fun getdata(){
+        val url = server_ip + "getuserdata.php"
+
+        val params = HashMap<String, String>()
+        params["userId"] = usr.id
+
+        val requestQueue = Volley.newRequestQueue(this)
+        val stringRequest = object : StringRequest(
+            Request.Method.POST,
+            url,
+            Response.Listener<String> { response ->
+                // Parse the JSON response
+                val userJson = JSONObject(response)
+                // Get the user data from the JSON object
+                usr.id = userJson.getString("id")
+                usr.name = userJson.getString("name")
+                usr.email = userJson.getString("email")
+                usr.number = userJson.getString("number")
+                usr.city = userJson.getString("city")
+                usr.country = userJson.getString("country")
+                usr.token = userJson.getString("token")
+                usr.profilepic = userJson.getString("profilepic")
+                usr.bgpic = userJson.getString("bgpic")
+            },
+            Response.ErrorListener { error ->
+            }
+        ) {
+            override fun getParams(): Map<String, String> {
+                return params
+            }
+        }
     }
 }
