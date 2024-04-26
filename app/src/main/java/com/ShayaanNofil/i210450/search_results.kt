@@ -27,12 +27,15 @@ class search_results : AppCompatActivity() {
     private var server_ip = "http://192.168.18.70//"
     private lateinit var mentorname: String
     private lateinit var usr: User
+    private var typeofuser = "user"
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_search_results)
         val intent = intent
         mentorname = intent.getStringExtra("mentor").toString()
         usr = intent.getSerializableExtra("user") as User
+        typeofuser = intent.getStringExtra("typeofuser").toString()
 
         if (mentorname.isEmpty()){
             getallmentors()
@@ -125,6 +128,7 @@ class search_results : AppCompatActivity() {
                         val intent = Intent(this@search_results, book_session::class.java)
                         intent.putExtra("object", model)
                         intent.putExtra("user", usr)
+                        intent.putExtra("typeofuser", typeofuser)
                         startActivity(intent)
                     }
                 })

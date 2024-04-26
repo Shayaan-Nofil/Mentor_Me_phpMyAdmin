@@ -7,9 +7,14 @@ import User
 import android.Manifest
 import android.content.Intent
 import android.content.pm.PackageManager
+import android.graphics.Bitmap
+import android.graphics.BitmapFactory
+import android.graphics.Matrix
+import android.media.ExifInterface
 import android.net.Uri
 import android.os.Build
 import android.os.Bundle
+import android.util.Base64
 import android.util.Log
 import android.widget.Button
 import android.widget.Toast
@@ -20,37 +25,40 @@ import androidx.camera.lifecycle.ProcessCameraProvider
 import androidx.camera.view.PreviewView
 import androidx.core.app.ActivityCompat
 import androidx.core.content.ContextCompat
-import com.google.firebase.Firebase
-import com.google.firebase.auth.auth
-import com.google.firebase.database.DataSnapshot
-import com.google.firebase.database.DatabaseError
-import com.google.firebase.database.FirebaseDatabase
-import com.google.firebase.database.ValueEventListener
-import com.google.firebase.storage.FirebaseStorage
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.GlobalScope
-import kotlinx.coroutines.launch
-import kotlinx.coroutines.tasks.await
+import com.android.volley.toolbox.StringRequest
+import com.android.volley.toolbox.Volley
+import com.google.gson.Gson
+import okhttp3.Call
+import okhttp3.Callback
+import okhttp3.MediaType.Companion.toMediaType
+import okhttp3.OkHttpClient
+import okhttp3.Request
+import okhttp3.RequestBody.Companion.toRequestBody
+import okhttp3.Response
+import org.json.JSONObject
+import java.io.ByteArrayOutputStream
 import java.io.File
+import java.io.IOException
 import java.text.SimpleDateFormat
 import java.util.*
 import java.util.concurrent.ExecutorService
 import java.util.concurrent.Executors
-import kotlin.random.Random
 
 class camera_picture_mode : AppCompatActivity() {
     private lateinit var cameraExecutor: ExecutorService
     private lateinit var outputDirectory: File
     private var imageCapture: ImageCapture? = null
     private var chat: Chats? = Chats()
-    private var userid: String = ""
+    private var user : User? = null
+    private var server_ip = "http://192.168.18.70//"
 
     @RequiresApi(Build.VERSION_CODES.TIRAMISU)
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_camera_picture_mode)
 
-        //chat = intent.getSerializableExtra("object") as Chats
+        user = intent.getSerializableExtra("user") as User
+
         val bundle = intent.extras
         if (bundle != null){
             chat = bundle.getSerializable("chatdata", Chats::class.java)
@@ -78,6 +86,7 @@ class camera_picture_mode : AppCompatActivity() {
         videobutton.setOnClickListener{
             val intent = Intent(this, camera_video_mode::class.java)
             val bundle = Bundle()
+            intent.putExtra("user", user)
             bundle.putSerializable("chatdata", chat)
             intent.putExtras(bundle)
             intent.putExtra("chatdata", chat)
@@ -146,75 +155,87 @@ class camera_picture_mode : AppCompatActivity() {
                 }
 
                 override fun onImageSaved(output: ImageCapture.OutputFileResults) {
-                    val savedUri = Uri.fromFile(photoFile)
-                    val msg = "Photo capture succeeded: $savedUri"
-                    Toast.makeText(baseContext, msg, Toast.LENGTH_SHORT).show()
-                    Log.d(TAG, msg)
+
+
+                    // Get the orientation of the image
+                    val exif = ExifInterface(photoFile.absolutePath)
+                    val orientation = exif.getAttributeInt(
+                        ExifInterface.TAG_ORIENTATION,
+                        ExifInterface.ORIENTATION_NORMAL
+                    )
+
+                    // Decode the saved file into a Bitmap
+                    var bitmap = BitmapFactory.decodeFile(photoFile.absolutePath)
+
+                    // Rotate the Bitmap according to the orientation
+                    bitmap = when (orientation) {
+                        ExifInterface.ORIENTATION_ROTATE_90 -> bitmap.rotate(90f)
+                        ExifInterface.ORIENTATION_ROTATE_180 -> bitmap.rotate(180f)
+                        ExifInterface.ORIENTATION_ROTATE_270 -> bitmap.rotate(270f)
+                        else -> bitmap
+                    }
+
+                    // Assign the rotated Bitmap to the img variable
+                    var savedUri = bitmap
 
                     // Upload the image to Firestore
-                    uploadImageToFirestore(savedUri)
+                    uploadImageToServer(savedUri)
+                }
+
+                // Extension function to rotate a Bitmap
+                fun Bitmap.rotate(degrees: Float): Bitmap {
+                    val matrix = Matrix()
+                    matrix.postRotate(degrees)
+                    return Bitmap.createBitmap(this, 0, 0, width, height, matrix, true)
                 }
             })
     }
 
-    private fun uploadImageToFirestore(uri: Uri) {
+    private fun uploadImageToServer(uri: Bitmap) {
         Thread(Runnable {
-            var message = Messages()
-            var mAuth = Firebase.auth
-            message!!.senderid = mAuth.uid.toString()
-            message!!.time = Calendar.getInstance().time.toString()
-            message!!.tag = "image"
+            var message: Messages = Messages()
+            message.time = Calendar.getInstance().time.toString()
+            message.senderid = user!!.id.toInt()
+            message.senderpic = user!!.profilepic
+            message.tag = "image"
+            message.chatid = chat!!.id.toInt()
 
-            val storageref = FirebaseStorage.getInstance().reference
+            val requestQueue = Volley.newRequestQueue(this)
+            val serverUrl = server_ip + "createimage_message.php"
 
-            storageref.child("Chats").child(chat!!.id + Random.nextInt(0,100000).toString()).putFile(uri).addOnSuccessListener {
-                it.metadata!!.reference!!.downloadUrl.addOnSuccessListener {task ->
-                    message.content = task.toString()
-                    Log.w("TAG", "Upload Success")
-
-                    FirebaseDatabase.getInstance().getReference("User").child(mAuth.uid.toString()).addListenerForSingleValueEvent(object:
-                        ValueEventListener {
-                        override fun onDataChange(snapshot: DataSnapshot) {
-                            if (snapshot.exists()) {
-                                val user = snapshot.getValue(User::class.java)
-                                if (user != null) {
-                                    Log.w("TAG", "in user, getting url")
-                                    message.senderpic = user.profilepic.toString()
-
-                                    message.id = FirebaseDatabase.getInstance().getReference("Chat").child(chat!!.id).child("Messages").push().key.toString()
-                                    FirebaseDatabase.getInstance().getReference("Chat").child(chat!!.id).child("Messages").child(message.id).setValue(message)
-                                    finish()
-                                }
-                            }
-                            else {
-                                FirebaseDatabase.getInstance().getReference("Mentor").child(mAuth.uid.toString()).addListenerForSingleValueEvent(object :
-                                    ValueEventListener {
-                                    override fun onDataChange(snapshot: DataSnapshot) {
-                                        if (snapshot.exists()) {
-                                            val user = snapshot.getValue(Mentors::class.java)
-                                            if (user != null) {
-                                                Log.w("TAG", "in mentor, getting url")
-                                                message.senderpic = user.profilepic.toString()
-
-                                                message.id = FirebaseDatabase.getInstance().getReference("Chat").child(chat!!.id).child("Messages").push().key.toString()
-                                                FirebaseDatabase.getInstance().getReference("Chat").child(chat!!.id).child("Messages").child(message.id).setValue(message)
-                                                finish()
-                                            }
-                                        }
-                                    }
-                                    override fun onCancelled(error: DatabaseError) {}
-                                })
-                            }
-                        }
-                        override fun onCancelled(error: DatabaseError) {}
-                    })
+            val stringRequest = object : StringRequest(
+                com.android.volley.Request.Method.POST,
+                serverUrl,
+                com.android.volley.Response.Listener { response ->
+                    sendNotiftoRecepients(chat!!, message)
+                },
+                com.android.volley.Response.ErrorListener { error ->
+                    Toast.makeText(this, error.toString(), Toast.LENGTH_LONG).show()
+                    Log.e("error", error.toString())
                 }
-            }.addOnFailureListener{
-                Log.w("TAG", "Upload failed")
+            ) {
+                override fun getParams(): MutableMap<String, String> {
+                    val params = HashMap<String, String>()
+                    val gson = Gson()
+                    val userJson = gson.toJson(message)
+                    params["message"] = userJson
+                    params.put("image",bitmapToBase64(uri))
+                    return params
+                }
             }
+            requestQueue.add(stringRequest)
+
         }).start()
 
         finish()
+    }
+
+    fun bitmapToBase64(dp: Bitmap):String{
+        var stream= ByteArrayOutputStream()
+        dp.compress(Bitmap.CompressFormat.JPEG,100,stream)
+        stream.toByteArray()
+        return Base64.encodeToString(stream.toByteArray(), Base64.DEFAULT).toString()
+
     }
 
     private fun allPermissionsGranted() = REQUIRED_PERMISSIONS.all {
@@ -243,5 +264,114 @@ class camera_picture_mode : AppCompatActivity() {
         private val REQUIRED_PERMISSIONS = arrayOf(Manifest.permission.CAMERA)
     }
 
+    fun sendPushNotification(token: String, title: String, subtitle: String, body: String, data: Map<String, String> = emptyMap()) {
+        val url = "https://fcm.googleapis.com/fcm/send"
+        val bodyJson = JSONObject()
+        bodyJson.put("to", token)
+        bodyJson.put("notification",
+            JSONObject().also {
+                it.put("title", title)
+                it.put("subtitle", subtitle)
+                it.put("body", body)
+                it.put("sound", "social_notification_sound.wav")
+            }
+        )
+        Log.d("TAG", "sendPushNotification: ${JSONObject(data)}")
+        if (data.isNotEmpty()) {
+            bodyJson.put("data", JSONObject(data))
+        }
+
+        var key="AAAAD3l6odE:APA91bFv-1TOpuvIoNLlqZxmR6v5-BfI4klzjVRUyak0fXtyIh7KBG76LokhbXDHOgGj8ufINA7kvc1VZGKI1EmGpPjI6N6z5QPPvm2u1K95bBNH37IgR6aHEF0qpSGhe6KxOD_zOEAD"
+        val request = Request.Builder()
+            .url(url)
+            .addHeader("Content-Type", "application/json")
+            .addHeader("Authorization", "key=$key")
+            .post(
+                bodyJson.toString().toRequestBody("application/json; charset=utf-8".toMediaType())
+            )
+            .build()
+
+        val client = OkHttpClient()
+
+        client.newCall(request).enqueue(
+            object : Callback {
+                override fun onResponse(call: Call, response: Response) {
+                    println("Received data: ${response.body?.string()}")
+                    Log.d("TAG", "onResponse: ${response}   ")
+                    Log.d("TAG", "onResponse Message: ${response.message}   ")
+                }
+
+                override fun onFailure(call: Call, e: IOException) {
+                    println(e.message.toString())
+                    Log.d("TAG", "onFailure: ${e.message.toString()}")
+                }
+            }
+        )
+    }
+    fun sendNotiftoRecepients(chats: Chats, message: Messages){
+
+        if (user!!.id.toInt() == chat!!.userid){
+            val serverUrl = server_ip + "getmentor_id.php"
+            val requestQueue = Volley.newRequestQueue(this)
+
+            val stringRequest = object : StringRequest(
+                Method.POST, serverUrl,
+                com.android.volley.Response.Listener<String> { response ->
+                    // Parse the response from the server
+                    if (response != "bad") {
+                        // Parse the JSON response into a User object
+                        val userJson = JSONObject(response)
+                        val mentor = Mentors()
+                        mentor.token = userJson.getString("token")
+
+                        sendPushNotification(mentor.token, "New Message " + user!!.name, "New Message from ", message.content, mapOf("chatid" to chat!!.id))
+                    }
+
+                },
+                com.android.volley.Response.ErrorListener { error ->
+                    // Handle error
+                    Log.w("TAG", "getting mentor failure", error)
+                }
+            ) {
+                override fun getParams(): Map<String, String> {
+                    val params = HashMap<String, String>()
+                    params["mentorid"] = chat!!.mentorid.toString()
+                    return params
+                }
+            }
+            requestQueue.add(stringRequest)
+        }
+        else if (user!!.id.toInt() == chat!!.mentorid){
+            val serverUrl = server_ip + "getuserdata.php"
+            val requestQueue = Volley.newRequestQueue(this)
+
+            val stringRequest = object : StringRequest(
+                Method.POST, serverUrl,
+                com.android.volley.Response.Listener<String> { response ->
+                    // Parse the response from the server
+                    if (response != "bad") {
+                        // Parse the JSON response into a User object
+                        val userJson = JSONObject(response)
+                        val mentor = User()
+                        mentor.token = userJson.getString("token")
+
+                        sendPushNotification(mentor.token, "New Message " + user!!.name, "New Message from ", message.content, mapOf("chatid" to chat!!.id))
+                    }
+
+                },
+                com.android.volley.Response.ErrorListener { error ->
+                    // Handle error
+                    Log.w("TAG", "getting mentor failure", error)
+                }
+            ) {
+                override fun getParams(): Map<String, String> {
+                    val params = HashMap<String, String>()
+                    params["userId"] = chat!!.userid.toString()
+                    return params
+                }
+            }
+            requestQueue.add(stringRequest)
+        }
+    }
 
 }

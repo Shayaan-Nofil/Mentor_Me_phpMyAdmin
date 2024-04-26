@@ -10,11 +10,14 @@ import android.widget.EditText
 
 class Search : AppCompatActivity() {
     lateinit var usr: User
+    private var typeofuser = "user"
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_search)
 
         usr = intent.getSerializableExtra("user") as User
+        typeofuser = intent.getStringExtra("typeofuser").toString()
 
         val backbutton=findViewById<View>(R.id.back_button)
         backbutton.setOnClickListener(View.OnClickListener {
@@ -43,6 +46,7 @@ class Search : AppCompatActivity() {
         task_searchbutton.setOnClickListener(View.OnClickListener {
             val temp = Intent(this, Search::class.java )
             temp.putExtra("user", usr)
+            temp.putExtra("typeofuser", typeofuser)
             startActivity(temp)
         })
 

@@ -2,6 +2,7 @@ import java.io.Serializable
 
 class Mentors: Serializable {
     var id: String = ""
+    var mAuth: String = ""
     var name: String = ""
     var email: String = ""
     var password: String = ""

@@ -29,20 +29,17 @@ private lateinit var database: DatabaseReference
 private lateinit var mAuth: FirebaseAuth
 class home_page : AppCompatActivity() {
     private var server_ip = "http://192.168.18.70//"
+    private var user = User()
+    private var typeofuser = "user"
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_home_page)
 
-        var user = intent.getSerializableExtra("user") as? User
-        val mentor = intent.getSerializableExtra("mentor") as? Mentors
+        user = intent.getSerializableExtra("user") as User
+        typeofuser = intent.getStringExtra("typeofuser").toString()
 
         val nametext: TextView = findViewById(R.id.user_name_text)
-
-        if (user != null) {
-            nametext.text = user.name
-        } else if (mentor != null) {
-            nametext.text = mentor.name
-        }
+        nametext.text = user.name
 
         val recycle_topmentor: RecyclerView = findViewById(R.id.recycle_top_mentors)
         val recycle_education: RecyclerView = findViewById(R.id.recycle_education)
@@ -118,6 +115,7 @@ class home_page : AppCompatActivity() {
         task_homebutton.setOnClickListener(View.OnClickListener {
             val temp = Intent(this, home_page::class.java )
             temp.putExtra("user", user)
+            temp.putExtra("typeofuser", typeofuser)
             startActivity(temp)
         })
 
@@ -125,6 +123,7 @@ class home_page : AppCompatActivity() {
         task_searchbutton.setOnClickListener(View.OnClickListener {
             val temp = Intent(this, Search::class.java )
             temp.putExtra("user", user)
+            temp.putExtra("typeofuser", typeofuser)
             startActivity(temp)
         })
 
@@ -132,6 +131,7 @@ class home_page : AppCompatActivity() {
         task_chatbutton.setOnClickListener(View.OnClickListener {
             val temp = Intent(this, chats_page::class.java )
             temp.putExtra("user", user)
+            temp.putExtra("typeofuser", typeofuser)
             startActivity(temp)
         })
 
@@ -139,6 +139,7 @@ class home_page : AppCompatActivity() {
         task_profilebutton.setOnClickListener(View.OnClickListener {
             val temp = Intent(this, profile_page::class.java )
             temp.putExtra("user", user)
+            temp.putExtra("typeofuser", typeofuser)
             startActivity(temp)
         })
 
@@ -146,6 +147,7 @@ class home_page : AppCompatActivity() {
         task_addcontent.setOnClickListener(View.OnClickListener {
             val temp = Intent(this, addnew_mentor::class.java )
             temp.putExtra("user", user)
+            temp.putExtra("typeofuser", typeofuser)
             startActivity(temp)
         })
     }

@@ -20,7 +20,7 @@ import java.text.SimpleDateFormat
 import java.util.Locale
 
 private lateinit var mAuth: FirebaseAuth
-class chat_recycle_adapter(private val items: MutableList<Messages>): RecyclerView.Adapter<chat_recycle_adapter.ViewHolder>() {
+class chat_recycle_adapter(private val items: MutableList<Messages>, private val user: User, private val typeofuser: String): RecyclerView.Adapter<chat_recycle_adapter.ViewHolder>() {
     private lateinit var onClickListener: chat_recycle_adapter.OnClickListener
     class ViewHolder (itemview: View): RecyclerView.ViewHolder(itemview){
         val senderimg: CircleImageView? = itemView.findViewById(R.id.sender_img)
@@ -29,7 +29,7 @@ class chat_recycle_adapter(private val items: MutableList<Messages>): RecyclerVi
     }
     override fun getItemViewType(position: Int): Int {
         mAuth = Firebase.auth
-        return if (items[position].senderid == mAuth.uid.toString()) {
+        return if (items[position].senderid == user.id.toInt()) {
             0 // view type for sent messages
         } else {
             1 // view type for received messages
@@ -75,7 +75,7 @@ class chat_recycle_adapter(private val items: MutableList<Messages>): RecyclerVi
                         val bitmapDrawable = BitmapDrawable(holder.itemView.resources, resource)
                         holder.messagecontent.background = bitmapDrawable
 
-                        if (message.senderid == mAuth.uid.toString()){
+                        if (message.senderid == user.id.toInt()){
                             val view = LayoutInflater.from(holder.itemView.context).inflate(R.layout.chat_message_sent_recycle, null)
                             holder.messagecontent = view.findViewById(R.id.message_content)
                         }
@@ -107,7 +107,7 @@ class chat_recycle_adapter(private val items: MutableList<Messages>): RecyclerVi
             val formattedDate = targetFormat.format(date!!)
             holder.messagetime.text = formattedDate
 
-            if (message.senderid == mAuth.uid.toString()){
+            if (message.senderid == user.id.toInt()){
                 val view = LayoutInflater.from(holder.itemView.context).inflate(R.layout.chat_message_sent_recycle, null)
                 holder.messagecontent = view.findViewById(R.id.message_content)
             }
@@ -138,7 +138,7 @@ class chat_recycle_adapter(private val items: MutableList<Messages>): RecyclerVi
             val formattedDate = targetFormat.format(date!!)
             holder.messagetime.text = formattedDate
 
-            if (message.senderid == mAuth.uid.toString()){
+            if (message.senderid == user.id.toInt()){
                 val view = LayoutInflater.from(holder.itemView.context).inflate(R.layout.chat_message_sent_recycle, null)
                 holder.messagecontent = view.findViewById(R.id.message_content)
             }
@@ -169,7 +169,7 @@ class chat_recycle_adapter(private val items: MutableList<Messages>): RecyclerVi
             val formattedDate = targetFormat.format(date!!)
             holder.messagetime.text = formattedDate
 
-            if (message.senderid == mAuth.uid.toString()){
+            if (message.senderid == user.id.toInt()){
                 val view = LayoutInflater.from(holder.itemView.context).inflate(R.layout.chat_message_sent_recycle, null)
                 holder.messagecontent = view.findViewById(R.id.message_content)
             }

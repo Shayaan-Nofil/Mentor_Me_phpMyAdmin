@@ -31,6 +31,7 @@ class addnew_mentor : AppCompatActivity() {
     var img: Bitmap?=null
     private var server_ip = "http://192.168.18.70//"
     lateinit var usr: User
+    private var typeofuser = "user"
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -38,6 +39,7 @@ class addnew_mentor : AppCompatActivity() {
         mentor = Mentors()
 
         usr = intent.getSerializableExtra("user") as User
+        typeofuser = intent.getStringExtra("typeofuser").toString()
 
         val backbutton=findViewById<View>(R.id.back_button)
         backbutton.setOnClickListener(View.OnClickListener {
@@ -70,6 +72,7 @@ class addnew_mentor : AppCompatActivity() {
         task_homebutton.setOnClickListener(View.OnClickListener {
             val temp = Intent(this, home_page::class.java )
             temp.putExtra("user", usr)
+            temp.putExtra("typeofuser", typeofuser)
             startActivity(temp)
         })
 
@@ -77,6 +80,7 @@ class addnew_mentor : AppCompatActivity() {
         task_searchbutton.setOnClickListener(View.OnClickListener {
             val temp = Intent(this, Search::class.java )
             temp.putExtra("user", usr)
+            temp.putExtra("typeofuser", typeofuser)
             startActivity(temp)
         })
 
@@ -84,6 +88,7 @@ class addnew_mentor : AppCompatActivity() {
         task_chatbutton.setOnClickListener(View.OnClickListener {
             val temp = Intent(this, chats_page::class.java )
             temp.putExtra("user", usr)
+            temp.putExtra("typeofuser", typeofuser)
             startActivity(temp)
         })
 
@@ -91,6 +96,7 @@ class addnew_mentor : AppCompatActivity() {
         task_profilebutton.setOnClickListener(View.OnClickListener {
             val temp = Intent(this, profile_page::class.java )
             temp.putExtra("user", usr)
+            temp.putExtra("typeofuser", typeofuser)
             startActivity(temp)
         })
 
@@ -98,6 +104,7 @@ class addnew_mentor : AppCompatActivity() {
         task_addcontent.setOnClickListener(View.OnClickListener {
             val temp = Intent(this, camera_picture_mode::class.java )
             temp.putExtra("user", usr)
+            temp.putExtra("typeofuser", typeofuser)
             startActivity(temp)
         })
     }

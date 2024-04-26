@@ -53,6 +53,7 @@ class profile_page : AppCompatActivity() {
     lateinit var usr: User
     var img: Bitmap?=null
     private var server_ip = "http://192.168.18.70//"
+    private var typeofuser = "user"
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_profile_page)
@@ -60,6 +61,7 @@ class profile_page : AppCompatActivity() {
         profilepicimg = findViewById(R.id.ali_profilepic)
         bgpicimg = findViewById(R.id.background_img)
 
+        typeofuser = intent.getStringExtra("typeofuser").toString()
         usr = intent.getSerializableExtra("user") as User
         val nametext: TextView = findViewById(R.id.username_text)
         nametext.text = usr.name
@@ -151,6 +153,7 @@ class profile_page : AppCompatActivity() {
         val task_homebutton=findViewById<View>(R.id.bthome)
         task_homebutton.setOnClickListener(View.OnClickListener {
             val temp = Intent(this, home_page::class.java )
+            intent.putExtra("typeofuser", typeofuser)
             temp.putExtra("user", usr)
             startActivity(temp)
         })
@@ -158,6 +161,7 @@ class profile_page : AppCompatActivity() {
         val task_searchbutton=findViewById<View>(R.id.btsearch)
         task_searchbutton.setOnClickListener(View.OnClickListener {
             val temp = Intent(this, Search::class.java )
+            intent.putExtra("typeofuser", typeofuser)
             temp.putExtra("user", usr)
             startActivity(temp)
         })
@@ -165,6 +169,7 @@ class profile_page : AppCompatActivity() {
         val task_chatbutton=findViewById<View>(R.id.btchat)
         task_chatbutton.setOnClickListener(View.OnClickListener {
             val temp = Intent(this, chats_page::class.java )
+            intent.putExtra("typeofuser", typeofuser)
             temp.putExtra("user", usr)
             startActivity(temp)
         })
@@ -173,12 +178,14 @@ class profile_page : AppCompatActivity() {
         task_profilebutton.setOnClickListener(View.OnClickListener {
             val temp = Intent(this, profile_page::class.java )
             temp.putExtra("user", usr)
+            intent.putExtra("typeofuser", typeofuser)
             startActivity(temp)
         })
 
         val task_addcontent=findViewById<View>(R.id.btaddcontent)
         task_addcontent.setOnClickListener(View.OnClickListener {
             val temp = Intent(this, addnew_mentor::class.java )
+            intent.putExtra("typeofuser", typeofuser)
             temp.putExtra("user", usr)
             startActivity(temp)
         })
@@ -285,9 +292,17 @@ class profile_page : AppCompatActivity() {
                 }
                 1 -> {
                     FirebaseAuth.getInstance().signOut()
+
+                    // Create an intent to launch the main activity of your app
                     val intent = Intent(this, Log_in_page::class.java)
-                    intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP or Intent.FLAG_ACTIVITY_NEW_TASK)
+
+                    // Set the new task and clear task flags
+                    intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TASK)
+
+                    // Start the main activity
                     startActivity(intent)
+
+                    // Finish the current activity
                     finish()
                 }
             }

@@ -16,7 +16,11 @@ import com.google.firebase.database.DatabaseReference
 import com.android.volley.toolbox.StringRequest
 import com.android.volley.toolbox.Volley
 import com.android.volley.Response
+import com.google.android.gms.tasks.OnCompleteListener
+import com.google.firebase.FirebaseApp
+import com.google.firebase.messaging.FirebaseMessaging
 import com.google.gson.Gson
+import org.json.JSONObject
 
 
 private lateinit var mAuth: FirebaseAuth
@@ -60,13 +64,13 @@ class sign_up : AppCompatActivity() {
                 user.city = city.text.toString()
                 user.country = country.selectedItem.toString()
 
-                signup(user)
+                signup(user.email, user.password, user)
             }
 
         })
     }
 
-    private fun signup(user: User) {
+    private fun signupsql(user: User) {
         val serverUrl = server_ip + "Signup_user.php"
         val requestQueue = Volley.newRequestQueue(this)
 
@@ -74,10 +78,8 @@ class sign_up : AppCompatActivity() {
             Method.POST, serverUrl,
             Response.Listener<String> { response ->
                 // Parse the response from the server
-                val secondActivityIntent = Intent(this@sign_up, profile_page::class.java)
-                secondActivityIntent.putExtra("user", user)
-                startActivity(secondActivityIntent)
-                finish()
+                user.mAuth = Firebase.auth.uid.toString()
+                signinsql(user.email, user.password)
             },
             Response.ErrorListener { error ->
                 // Handle error
@@ -99,96 +101,102 @@ class sign_up : AppCompatActivity() {
         requestQueue.add(stringRequest)
     }
 
-//    fun signup(email:String,pass:String){
-//        mAuth.createUserWithEmailAndPassword(email, pass)
-//            .addOnCompleteListener(this) { task ->
-//                if (task.isSuccessful) {
-//                    Log.d("TAG", "createUserWithEmail:success")
-//
-//                    database = FirebaseDatabase.getInstance().getReference("User")
-//                    var usr: User = User()
-//                    var userId = mAuth.uid;
-//                    usr.addData(userId.toString(), name.text.toString(), email, number.text.toString(), city.text.toString(), country.selectedItem.toString())
-//                    usr.id = mAuth.uid.toString()
-//
-//                    database.child(userId!!).setValue(usr).addOnCompleteListener {
-//
-//                        FirebaseApp.initializeApp(this)
-//                        FirebaseMessaging.getInstance().token.addOnCompleteListener(
-//                            OnCompleteListener { task ->
-//                            if (!task.isSuccessful) {
-//                                Log.w("TAG", "Fetching FCM registration token failed", task.exception)
-//                                return@OnCompleteListener
-//                            }
-//                            // Get new FCM registration token
-//                            val token = task.result
-//                            Log.d("MyToken", token)
-//
-//                            FirebaseDatabase.getInstance().getReference("User").child(mAuth.uid.toString()).addListenerForSingleValueEvent(object:
-//                                ValueEventListener {
-//                                override fun onDataChange(snapshot: DataSnapshot) {
-//                                    if (snapshot.exists()) {
-//                                        Log.w("TAG", "User is a user")
-//                                        var usr : User = snapshot.getValue(User::class.java)!!
-//                                        FirebaseMessaging.getInstance().token.addOnCompleteListener(OnCompleteListener { task ->
-//                                            if (!task.isSuccessful) {
-//                                                Log.w("TAG", "Fetching FCM registration token failed", task.exception)
-//                                                return@OnCompleteListener
-//                                            }
-//                                            // Get new FCM registration token
-//                                            val token = task.result
-//                                            Log.d("MyToken", token)
-//                                            usr.token = token
-//                                            FirebaseDatabase.getInstance().getReference("User")
-//                                                .child(Firebase.auth.uid.toString()).setValue(usr)
-//                                        })
-//
-//                                    }
-//                                    else{
-//                                        Log.w("TAG", "User is a mentor")
-//                                        FirebaseDatabase.getInstance().getReference("Mentor").child(mAuth.uid.toString()).addListenerForSingleValueEvent(object:
-//                                            ValueEventListener {
-//                                            override fun onDataChange(snapshot: DataSnapshot) {
-//                                                if (snapshot.exists()) {
-//                                                    var usr : Mentors = snapshot.getValue(Mentors::class.java)!!
-//                                                    FirebaseMessaging.getInstance().token.addOnCompleteListener(OnCompleteListener { task ->
-//                                                        if (!task.isSuccessful) {
-//                                                            Log.w("TAG", "Fetching FCM registration token failed", task.exception)
-//                                                            return@OnCompleteListener
-//                                                        }
-//                                                        // Get new FCM registration token
-//                                                        val token = task.result
-//                                                        Log.d("MyToken", token)
-//                                                        usr.token = token
-//                                                        FirebaseDatabase.getInstance().getReference("Mentor")
-//                                                            .child(Firebase.auth.uid.toString()).setValue(usr)
-//                                                    })
-//                                                }
-//                                            }
-//                                            override fun onCancelled(error: DatabaseError) {}
-//                                        })
-//
-//                                    }
-//                                }
-//                                override fun onCancelled(error: DatabaseError) {}
-//                            })
-//                        })
-//
-//                        var secondActivityIntent = Intent(this, profile_page::class.java)
-//                        startActivity(secondActivityIntent)
-//                        finish()
-//                    }.addOnFailureListener{
-//                        Log.w("TAG", "Didnt Register", task.exception)
-//                    }
-//
-//                } else {
-//                    // If sign in fails, display a message to the user.
-//                    Log.w("TAG", "createUserWithEmail:failure", task.exception)
-//                    val text = "Didnt work"
-//                    val duration = Toast.LENGTH_SHORT
-//                    val toast = Toast.makeText(this, text, duration) // in Activity
-//                    toast.show()
-//                }
-//            }
-//    }
+    private fun signinsql(email: String, pass: String) {
+        val serverUrl = server_ip + "Login_user.php"
+        val requestQueue = Volley.newRequestQueue(this)
+
+        val stringRequest = object : StringRequest(
+            Method.POST, serverUrl,
+            Response.Listener<String> { response ->
+                // Parse the response from the server
+                if (response != "bad") {
+                    // Parse the JSON response into a User object
+                    val userJson = JSONObject(response)
+                    val user = User()
+                    user.id = userJson.getString("id")
+                    user.name = userJson.getString("name")
+                    user.email = userJson.getString("email")
+                    user.number = userJson.getString("number")
+                    user.city = userJson.getString("city")
+                    user.country = userJson.getString("country")
+                    user.token = userJson.getString("token")
+                    user.profilepic = userJson.getString("profilepic")
+                    user.bgpic = userJson.getString("bgpic")
+
+                    user.mAuth = Firebase.auth.uid.toString()
+                    FirebaseMessaging.getInstance().token.addOnCompleteListener(OnCompleteListener { task ->
+                        if (!task.isSuccessful) {
+                            Log.w("TAG", "Fetching FCM registration token failed", task.exception)
+                            return@OnCompleteListener
+                        }
+                        // Get new FCM registration token
+                        val token = task.result
+                        Log.d("MyToken", token)
+                        user.token = token
+                        signuptoken(user.id, token, "user", user.mAuth)
+
+                        Log.w("TAG", "signInWithEmail:success")
+                        val secondActivityIntent = Intent(this, profile_page::class.java)
+                        secondActivityIntent.putExtra("user", user)
+                        startActivity(secondActivityIntent)
+                    })
+
+                }
+            },
+            Response.ErrorListener { error ->
+                // Handle error
+                Log.w("TAG", "signInWithEmail:failure", error)
+            }
+        ) {
+            override fun getParams(): Map<String, String> {
+                val params = HashMap<String, String>()
+                params["table"] = "user"
+                params["email"] = email
+                params["password"] = pass
+                return params
+            }
+        }
+        requestQueue.add(stringRequest)
+    }
+
+    fun signup(email:String,pass:String, user: User){
+        mAuth.createUserWithEmailAndPassword(email, pass)
+            .addOnCompleteListener(this) { task ->
+                if (task.isSuccessful) {
+                    Log.d("TAG", "createUserWithEmail:success")
+                    signupsql(user)
+                }
+        }
+    }
+
+    private fun signuptoken(userid: String, token: String, table: String, mAuth: String) {
+        val serverUrl = server_ip + "updatetoken_user.php"
+        val requestQueue = Volley.newRequestQueue(this)
+
+        val stringRequest = object : StringRequest(
+            Method.POST, serverUrl,
+            Response.Listener<String> { response ->
+                Log.w("TAG", response)
+                finish()
+            },
+            Response.ErrorListener { error ->
+                // Handle error
+                Log.w("TAG", "createUserWithEmail:failure")
+                val text = "Didn't work"
+                val duration = Toast.LENGTH_SHORT
+                val toast = Toast.makeText(this, text, duration) // in Activity
+                toast.show()
+            }
+        ) {
+            override fun getParams(): Map<String, String> {
+                val params = HashMap<String, String>()
+                params["userid"] = userid
+                params["token"] = token
+                params["table"] = table
+                params["mAuth"] = mAuth
+                return params
+            }
+        }
+        requestQueue.add(stringRequest)
+    }
 }

@@ -32,6 +32,7 @@ class book_session : AppCompatActivity() {
     private var server_ip = "http://192.168.18.70//"
     lateinit var mentor: Mentors
     lateinit var user: User
+    private var typeofuser = "user"
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_book_session)
@@ -40,6 +41,7 @@ class book_session : AppCompatActivity() {
 
         mentor = intent.getSerializableExtra("object") as Mentors
         user = intent.getSerializableExtra("user") as User
+        typeofuser = intent.getStringExtra("typeofuser").toString()
 
         if (mentor != null){
             val mentorname: TextView = findViewById(R.id.name_text)
@@ -219,6 +221,7 @@ class book_session : AppCompatActivity() {
                     val temp = Intent(this, individual_chat::class.java )
                     temp.putExtra("chat", chat)
                     temp.putExtra("user", user)
+                    temp.putExtra("typeofuser", typeofuser)
                     startActivity(temp)
                 } else {
                     Log.w("TAG", "No chat found")

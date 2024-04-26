@@ -19,7 +19,7 @@ import de.hdodenhof.circleimageview.CircleImageView
 private lateinit var mAuth: FirebaseAuth
 private lateinit var database: DatabaseReference
 private lateinit var typeofuser: String
-class chatsearch_recycle_adapter(private val items: MutableList<Chats>, private val user: User): RecyclerView.Adapter<chatsearch_recycle_adapter.ViewHolder>() {
+class chatsearch_recycle_adapter(private val items: MutableList<Chats>, private val user: User, private var usertype: String): RecyclerView.Adapter<chatsearch_recycle_adapter.ViewHolder>() {
     private lateinit var onClickListener: chatsearch_recycle_adapter.OnClickListener
 
     class ViewHolder (itemview: View): RecyclerView.ViewHolder(itemview){
@@ -39,7 +39,7 @@ class chatsearch_recycle_adapter(private val items: MutableList<Chats>, private 
     }
     override fun onBindViewHolder(holder: chatsearch_recycle_adapter.ViewHolder, position: Int) {
         val chat = items[position]
-        if (user.id.toInt() == chat.userid){
+        if (user.id.toInt() == chat.userid && usertype == "user"){
             holder.personname.text = chat.mentorname
 
             Glide.with(holder.itemView)
