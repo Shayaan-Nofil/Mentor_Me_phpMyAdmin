@@ -35,7 +35,7 @@ private lateinit var typeofuser: String
 private lateinit var userchats : MutableList<String>
 class chats_page : AppCompatActivity() {
     lateinit var user: User
-    private var server_ip = "http://192.168.18.70//"
+    private var server_ip = "http://192.168.68.184//"
     private var typeofuser = "user"
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)

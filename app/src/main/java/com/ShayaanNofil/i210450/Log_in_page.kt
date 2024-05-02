@@ -32,7 +32,7 @@ private lateinit var mAuth: FirebaseAuth
 class Log_in_page : AppCompatActivity() {
     lateinit var email: EditText
     lateinit var password: EditText
-    private var server_ip = "http://192.168.18.70//"
+    private var server_ip = "http://192.168.68.184//"
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_log_in)

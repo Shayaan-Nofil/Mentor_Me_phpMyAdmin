@@ -24,7 +24,7 @@ import org.json.JSONObject
 import searchrecycle_adapter
 
 class search_results : AppCompatActivity() {
-    private var server_ip = "http://192.168.18.70//"
+    private var server_ip = "http://192.168.68.184//"
     private lateinit var mentorname: String
     private lateinit var usr: User
     private var typeofuser = "user"

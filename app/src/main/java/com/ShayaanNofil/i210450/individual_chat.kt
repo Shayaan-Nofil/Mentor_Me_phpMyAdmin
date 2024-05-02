@@ -65,8 +65,6 @@ import org.json.JSONArray
 import java.io.ByteArrayOutputStream
 
 private lateinit var mAuth: FirebaseAuth
-private lateinit var database: DatabaseReference
-private lateinit var username: String
 class individual_chat : AppCompatActivity() {
     private var messages: Messages? = null
     private var messageimg: Uri? = null
@@ -77,7 +75,7 @@ class individual_chat : AppCompatActivity() {
     private var recording : Boolean = false
     private var mediaRecorder: MediaRecorder? = null
     private var audioFile: File? = null
-    private var server_ip = "http://192.168.18.70//"
+    private var server_ip = "http://192.168.68.184//"
     var img: Bitmap?=null
     private var typeofuser : String = "user"
 

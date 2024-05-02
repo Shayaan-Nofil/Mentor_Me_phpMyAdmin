@@ -50,7 +50,7 @@ class camera_picture_mode : AppCompatActivity() {
     private var imageCapture: ImageCapture? = null
     private var chat: Chats? = Chats()
     private var user : User? = null
-    private var server_ip = "http://192.168.18.70//"
+    private var server_ip = "http://192.168.68.184//"
 
     @RequiresApi(Build.VERSION_CODES.TIRAMISU)
     override fun onCreate(savedInstanceState: Bundle?) {

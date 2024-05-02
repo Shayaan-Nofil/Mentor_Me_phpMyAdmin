@@ -16,7 +16,7 @@ import com.android.volley.toolbox.Volley
 import org.json.JSONArray
 
 class booked_sessions : AppCompatActivity() {
-    private var server_ip = "http://192.168.18.70//"
+    private var server_ip = "http://192.168.68.184//"
     lateinit var usr: User
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)

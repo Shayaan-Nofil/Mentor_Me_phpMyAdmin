@@ -32,7 +32,7 @@ class sign_up : AppCompatActivity() {
     lateinit var number: EditText
     lateinit var city: EditText
     lateinit var  country: Spinner
-    private var server_ip = "http://192.168.18.70//"
+    private var server_ip = "http://192.168.68.184//"
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_sign_up)

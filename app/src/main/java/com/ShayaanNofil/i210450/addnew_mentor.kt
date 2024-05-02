@@ -29,7 +29,7 @@ class addnew_mentor : AppCompatActivity() {
     lateinit var mentor: Mentors
     lateinit var uppic: ImageView
     var img: Bitmap?=null
-    private var server_ip = "http://192.168.18.70//"
+    private var server_ip = "http://192.168.68.184//"
     lateinit var usr: User
     private var typeofuser = "user"
 

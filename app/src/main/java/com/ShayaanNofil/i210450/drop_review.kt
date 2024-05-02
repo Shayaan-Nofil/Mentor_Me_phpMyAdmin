@@ -29,7 +29,7 @@ import de.hdodenhof.circleimageview.CircleImageView
 private lateinit var mAuth: FirebaseAuth
 private lateinit var database: DatabaseReference
 class drop_review : AppCompatActivity() {
-    private var server_ip = "http://192.168.18.70//"
+    private var server_ip = "http://192.168.68.184//"
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_drop_review)

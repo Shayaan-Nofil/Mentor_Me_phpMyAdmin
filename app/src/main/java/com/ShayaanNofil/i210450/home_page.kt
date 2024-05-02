@@ -28,7 +28,7 @@ import org.json.JSONObject
 private lateinit var database: DatabaseReference
 private lateinit var mAuth: FirebaseAuth
 class home_page : AppCompatActivity() {
-    private var server_ip = "http://192.168.18.70//"
+    private var server_ip = "http://192.168.68.184//"
     private var user = User()
     private var typeofuser = "user"
     override fun onCreate(savedInstanceState: Bundle?) {

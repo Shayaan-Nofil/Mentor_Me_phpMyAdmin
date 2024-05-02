@@ -29,7 +29,7 @@ import java.util.Calendar
 private lateinit var mAuth: FirebaseAuth
 private lateinit var database: DatabaseReference
 class book_session : AppCompatActivity() {
-    private var server_ip = "http://192.168.18.70//"
+    private var server_ip = "http://192.168.68.184//"
     lateinit var mentor: Mentors
     lateinit var user: User
     private var typeofuser = "user"

@@ -52,7 +52,7 @@ class profile_page : AppCompatActivity() {
     private var backPictureUri: Uri? = null
     lateinit var usr: User
     var img: Bitmap?=null
-    private var server_ip = "http://192.168.18.70//"
+    private var server_ip = "http://192.168.68.184//"
     private var typeofuser = "user"
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)

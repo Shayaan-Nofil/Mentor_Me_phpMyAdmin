@@ -60,7 +60,7 @@ class camera_video_mode : AppCompatActivity() {
     private var recording: Recording? = null
     private var isrec: Boolean = false
     private var user : User? = null
-    private var server_ip = "http://192.168.18.70//"
+    private var server_ip = "http://192.168.68.184//"
 
     @RequiresApi(Build.VERSION_CODES.TIRAMISU)
     override fun onCreate(savedInstanceState: Bundle?) {
